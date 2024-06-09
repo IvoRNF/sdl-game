@@ -34,12 +34,12 @@ VertexArray::VertexArray(float* verts, int numVerts,
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9,
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9 ,
 		reinterpret_cast<void*>(sizeof(float) * 3));
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 9,
-		reinterpret_cast<void*>(sizeof(float) * 4));	
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(float) *  9,
+		reinterpret_cast<void*>(sizeof(float) * 5));	
 
 }
 

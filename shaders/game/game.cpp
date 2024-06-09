@@ -34,29 +34,29 @@ Game::Game()
       /* POS(3) - TEXTCORD(2) - COLOR(4)*/
       vertexBuffer{
           // first triangle LEFT
-          -0.5f, 0.5f, -1.0f,    0.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f, // L 0
-          0.5f, 0.5f, -1.0f,     1.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,  // R
-          0.5f, -0.5f, -1.0f,    0.0f, 1.0f,    1.0f, 0.50f, 0.0f, 1.0f, // B
+          -0.5f, 0.5f, -1.0f,    0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f, // L 0
+          0.5f, 0.5f, -1.0f,     1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,  // R
+          0.5f, -0.5f, -1.0f,    0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f, // B
 
-          -0.5f, -0.5f, -1.0f,   0.2f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          0.5f, -0.5f, -1.0f,    0.0f, 1.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          -0.5f, 0.5f, -1.0f,    0.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
+          -0.5f, -0.5f, -1.0f,   0.2f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.5f, -0.5f, -1.0f,    0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          -0.5f, 0.5f, -1.0f,    0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
 
-          0.0f, 0.0f, 0.5f,      0.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          0.5f, 0.5f, -1.0f,     1.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          0.5f, -0.5f, -1.0f,    0.0f, 1.0f,    1.0f, 0.50f, 0.0f, 1.0f,
+          0.0f, 0.0f, 0.5f,      0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.5f, 0.5f, -1.0f,     1.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.5f, -0.5f, -1.0f,    0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
 
-          -0.5f, 0.5f, -1.0f,    0.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          0.5f, 0.5f, -1.0f,     1.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          0.0f, 0.0f, 0.5f,      0.0f, 1.0f,    1.0f, 0.50f, 0.0f, 1.0f,
+          -0.5f, 0.5f, -1.0f,    0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.5f, 0.5f, -1.0f,     1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.0f, 0.0f, 0.5f,      0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
 
-          0.5f, -0.5f, -1.0f,    0.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          -0.5f, -0.5f, -1.0f,   1.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          0.0f, 0.0f, 0.5f,      0.0f, 1.0f,    1.0f, 0.50f, 0.0f, 1.0f,
+          0.5f, -0.5f, -1.0f,    0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          -0.5f, -0.5f, -1.0f,   1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.0f, 0.0f, 0.5f,      0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
 
-          -0.5f, -0.5f, -1.0f,   0.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          0.0f, 0.0f, 0.5f,      1.0f, 0.0f,    1.0f, 0.50f, 0.0f, 1.0f,
-          -0.5f, 0.5f, -1.0f,    0.0f, 1.0f,    1.0f, 0.50f, 0.0f, 1.0f 
+          -0.5f, -0.5f, -1.0f,   0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.0f, 0.0f, 0.5f,      0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          -0.5f, 0.5f, -1.0f,    1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f 
 
           
           },
@@ -249,17 +249,19 @@ void Game::DoOutput()
   Matrix4 transformMatrix = rotatedX * rotatedY;
   Matrix4 tranlationM = Matrix4::Identity();
   Matrix4 scaleM = Matrix4::Identity();
-  float scale =  this->computeCurrentScale();
-  Matrix4::Scale(scale, scaleM);
-  transformMatrix *= scaleM;
+  //float scale =  this->computeCurrentScale();
+  //Matrix4::Scale(scale, scaleM);
+  //transformMatrix *= scaleM;
 
   auto degrees = this->rotations[this->currentRotationIndex++] * this->scaleDirection;
   if (this->currentRotationIndex == 12)
   {
     this->currentRotationIndex = 0;
   }
-  auto rotatedY2 = this->currentRotationAxis != None ? Matrix4::RotationMatrix(this->currentRotationAxis, degrees) : Matrix4::RotationMatrix(Y, degrees);
-  transformMatrix *= rotatedY2;
+  if(this->currentRotationAxis != None ){
+    auto rotatedY2 = Matrix4::RotationMatrix(this->currentRotationAxis, degrees);
+    transformMatrix *= rotatedY2;
+  }
 
   this->spriteShader->SetMatrixUniform("transformMatrix", transformMatrix.AsFloatPtr());
 
