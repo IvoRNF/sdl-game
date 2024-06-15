@@ -64,9 +64,8 @@ Game::Game()
       indexBuffer{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17},
       currentScale(0.0f),
       scaleDirection(1),
-      rotations{30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360},
-      currentRotationIndex(0),
-      currentRotationAxis(None)
+      currentRotationAxis(None),
+      currentRotation(0.10f)
 
 {
 }
@@ -249,20 +248,24 @@ void Game::DoOutput()
   Matrix4 transformMatrix = rotatedX * rotatedY;
   Matrix4 tranlationM = Matrix4::Identity();
   Matrix4 scaleM = Matrix4::Identity();
-  //float scale =  this->computeCurrentScale();
-  //Matrix4::Scale(scale, scaleM);
-  //transformMatrix *= scaleM;
+  float scale =  0.77f;//this->computeCurrentScale();
+  Matrix4::Scale(scale, scaleM);
+  transformMatrix *= scaleM;
 
-  auto degrees = this->rotations[this->currentRotationIndex++] * this->scaleDirection;
-  if (this->currentRotationIndex == 12)
-  {
-    this->currentRotationIndex = 0;
-  }
+  
   if(this->currentRotationAxis != None ){
+    auto degrees = this->currentRotation;
+  this->currentRotation += 0.56f;
+  if(this->currentRotation>=360){
+    this->currentRotation = 0.01f;
+  }
     auto rotatedY2 = Matrix4::RotationMatrix(this->currentRotationAxis, degrees);
     transformMatrix *= rotatedY2;
   }
-
+  //Matrix4 viewProj = Matrix4::CreateSimpleViewProj(Width,Height);
+  //Matrix4 fov = Matrix4::CreatePerspectiveFOV(0.0f,0.0f,600.0f,100.0f,100.0f);
+  //transformMatrix *= viewProj;
+  //transformMatrix *= fov;
   this->spriteShader->SetMatrixUniform("transformMatrix", transformMatrix.AsFloatPtr());
 
   glDrawElements(GL_TRIANGLES, VertCount, GL_UNSIGNED_INT, nullptr);

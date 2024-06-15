@@ -32,8 +32,7 @@ private:
     Texture *texture;
     float currentScale;
     int scaleDirection;
+    float currentRotation;
     VecAxis currentRotationAxis;
-    int currentRotationIndex;
-    float rotations[12];
     void printV();
 };
