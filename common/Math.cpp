@@ -14,7 +14,16 @@ Matrix4 Matrix4::Identity()
     return Matrix4(result);
 }
 
-
+void Matrix4::print(){
+     //std::cout << "\x1B[2J\x1B[H";
+    for(int i = 0 ; i < 4 ; i++){
+       for(int j = 0 ; j < 4 ; j++){
+           
+           printf(" %f ",this->mat[i][j]);   
+       } 
+       std::cout << std::endl;
+    }
+}
 Matrix4 Matrix4::Multiply(Matrix4& first, Matrix4& second){
     auto result = Matrix4::Identity();  
     auto sumRowByCol = [&](int row,int col){
@@ -61,6 +70,8 @@ Matrix4 Matrix4::RotateAxis(VecAxis axis, float degrees, Matrix4 &mat4)
     }
     return mat4;
 }
+
+
 
 Matrix4 Matrix4::RotationMatrix(VecAxis axis, float degrees){
    Matrix4 result = Matrix4::Identity();

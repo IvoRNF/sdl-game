@@ -6,7 +6,8 @@
 #include <string>
 #include <memory.h>
 #include <cmath>
-
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 using namespace std;
 
 
@@ -21,6 +22,10 @@ class Matrix4 {
       explicit Matrix4(float matinput[4][4]){
         memcpy(mat,matinput, 16 * sizeof(float));
       }
+      explicit Matrix4(glm::mat4 &mat4){
+        float * matinput = glm::value_ptr(mat4); 
+        memcpy(mat,matinput, 16 * sizeof(float));
+      }
       static Matrix4 Identity();
       static Matrix4 RotateAxis(VecAxis axis,float degrees, Matrix4& mat4);
       static Matrix4 RotationMatrix(VecAxis axis, float degress);
@@ -30,7 +35,7 @@ class Matrix4 {
       friend Matrix4 operator*(Matrix4& first, Matrix4& second){
         return Matrix4::Multiply(first,second);
       }
-      Matrix4& operator*=(Matrix4& right)
+      Matrix4& operator*=(Matrix4&& right)
       {
         *this = Matrix4::Multiply(*this,right);
         return *this;
@@ -63,6 +68,7 @@ class Matrix4 {
         };
         return Matrix4(temp);
       }
+      void print();
       /*static Matrix4 CreateLookAt(const Vector3& eye, const Vector3& target, const Vector3& up)
       {
         Vector3 zaxis = Vector3::Normalize(target - eye);

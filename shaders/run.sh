@@ -1,4 +1,6 @@
 #!/bin/bash
+pkill main
+rm -r ./build/* &
 outname=1
 for f in ./**/*.cpp ./*.cpp ../common/*.cpp; do 
  g++ -c ${f} -o "./build/$outname.o"
@@ -11,4 +13,5 @@ eval $cmd
 ./main & echo "runned"
 # sudo apt-get install libglew-dev
 # sudo apt-get install libsoil-dev
+# sudo apt install libglm-dev
 
