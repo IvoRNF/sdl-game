@@ -6,6 +6,11 @@
 #include "../../common/VertexArray.h"
 #include "./Shader.h"
 #include "../../common/Math.h"
+#include <glm/ext/matrix_clip_space.hpp> // glm::perspective
+#include <glm/mat4x4.hpp> // glm::mat4
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace std;
 
@@ -14,60 +19,76 @@ const int Height = 700;
 
 const int VertCount = 18;
 const int uniqueVertexCount = 18;
+const float zz1 = -18.0f; 
+const float zz2 = -1.0f;
 
 Game::Game()
     : window(nullptr), context(nullptr), ticksCount(0), running(true), vertexArray(nullptr),
       texture(nullptr),
       /*vertexBuffer{
           // first triangle LEFT
-          -0.5f,0.5f,-1.0f, 0.0f,0.0f, //L
-          0.5f,0.5f,-1.0f,  1.0f,0.0f, //R
-          0.5f,-0.5f,-1.0f,  0.0f,1.0f, //B
+          -0.5f,0.5f,-1.0f, 0.0f,0.0f,   1.000f, 0.271f, 0.000f,0.5f,//L
+          0.5f,0.5f,-1.0f,  1.0f,0.0f,   1.000f, 0.271f, 0.000f,0.5f,//R
+          0.5f,-0.5f,-1.0f,  0.0f,1.0f,  1.000f, 0.271f, 0.000f,0.5f,//B
 
 
-          -0.5f,-0.5f,-1.0f,  0.2f,0.0f,//L
+          -0.5f,-0.5f,-1.0f,  0.2f,0.0f,  1.000f, 0.271f, 0.000f,0.5f,//L
 
-          0.0f,0.0f,0.5f, 0.0f,0.0f,
+          0.0f,0.0f,0.5f, 0.0f,0.0f,1.000f, 0.271f, 0.000f,0.5f
       },
       indexBuffer{0, 1, 2,    3,2,0,  4,1,2,   0,1,4,  2,3,4,  3,4,0},*/
 
       /* POS(3) - TEXTCORD(2) - COLOR(4)*/
+      //-1.0f = -0.33f
+      //0.5 = 0.15
+      
+
       vertexBuffer{
           // first triangle LEFT
-          -0.5f, 0.5f, -1.0f,    0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f, // L 0
-          0.5f, 0.5f, -1.0f,     1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,  // R
-          0.5f, -0.5f, -1.0f,    0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f, // B
+              
+         
 
-          -0.5f, -0.5f, -1.0f,   0.2f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          0.5f, -0.5f, -1.0f,    0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          -0.5f, 0.5f, -1.0f,    0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          -0.5f, -0.5f, zz1,   0.2f, 0.0f,    1.000f, 0.0f, 0.0f,0.5f,
+          0.5f, -0.5f, zz1,    0.0f, 1.0f,     1.000f, 0.0f, 0.0f,0.5f,
+          -0.5f, 0.5f, zz1,    0.0f, 0.0f,     1.000f, 0.0f, 0.0f,0.5f,
+          
 
-          0.0f, 0.0f, 0.5f,      0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          0.5f, 0.5f, -1.0f,     1.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          0.5f, -0.5f, -1.0f,    0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.0f, 0.0f, zz2,      0.0f, 0.0f,    0.000f, 1.0f, 0.000f,0.5f,
+          0.5f, 0.5f, zz1,     1.0f, 1.0f,    0.000f, 1.0f, 0.000f,0.5f,
+          0.5f, -0.5f, zz1,    0.0f, 1.0f,    0.000f, 1.0f, 0.000f,0.5f,
 
-          -0.5f, 0.5f, -1.0f,    0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          0.5f, 0.5f, -1.0f,     1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          0.0f, 0.0f, 0.5f,      0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          -0.5f, 0.5f, zz1,    0.0f, 0.0f,    0.000f, 1.0f, 1.0f,0.5f,
+          0.5f, 0.5f, zz1,     1.0f, 0.0f,    0.000f, 1.0f, 1.0f,0.5f,
+          0.0f, 0.0f, zz2,      0.0f, 1.0f,    0.000f, 1.0f, 1.0f,0.5f,
 
-          0.5f, -0.5f, -1.0f,    0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          -0.5f, -0.5f, -1.0f,   1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          0.0f, 0.0f, 0.5f,      0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.5f, -0.5f, zz1,    0.0f, 0.0f,    1.00f, 0.0f, 1.00f,0.5f,
+          -0.5f, -0.5f, zz1,   1.0f, 0.0f,    1.00f, 0.0f, 1.00f,0.5f,
+          0.0f, 0.0f, zz2,      0.0f, 1.0f,    1.00f, 0.0f, 1.00f,0.5f,
 
-          -0.5f, -0.5f, -1.0f,   0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          0.0f, 0.0f, 0.5f,      0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          -0.5f, 0.5f, -1.0f,    1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f 
-
+          -0.5f, -0.5f, zz1,   0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          0.0f, 0.0f, zz2,      0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
+          -0.5f, 0.5f, zz1,    1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f 
           
           },
 
       indexBuffer{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17},
-      currentScale(0.0f),
-      scaleDirection(1),
       currentRotationAxis(None),
-      currentRotation(0.10f)
-
+      currentRotation(0.10f),
+      cameraDirection{glm::vec3(0.0f, 0.0f,  3.0f)},
+      cameraRight{glm::vec3(0.0f, 0.0f, -1.0f)},
+      cameraUp{glm::vec3(1.0f, 0.0f,  0.0f)},
+      rotationAngle(35.0f)
+  
 {
+
+   // std::memset(vertexBuffer,0,166);
+
+    glm::vec3 cameraTarget = glm::vec3(0.0f,0.0f, 0.0f);
+    cameraDirection = glm::normalize(cameraDirection - cameraTarget);
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
+    cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+    cameraUp = glm::cross(cameraDirection, cameraRight);
+    cameraRight = glm::vec3(0.0f, 0.0f, -1.0f);
 }
 bool Game::Init()
 {
@@ -140,21 +161,6 @@ void Game::Loop()
     this->DoOutput();
   }
 }
-
-void Game::printV()
-{
-  cout << " " << endl;
-  int i = 0;
-  for (float n : this->vertexBuffer)
-  {
-    printf("%.2ff,", n);
-    if(i % 9 == 0){
-      printf("\n");
-    }
-    i++;
-  }
-}
-
 void Game::ShutDown()
 {
   SDL_GL_DeleteContext(this->context);
@@ -181,12 +187,6 @@ void Game::ProcessInput()
   {
     this->running = false;
   }
-
-  if (state[SDL_SCANCODE_P])
-  {
-    this->printV();
-  }
-
   if (state[SDL_SCANCODE_Z])
   {
     this->currentRotationAxis = Z;
@@ -206,6 +206,24 @@ void Game::ProcessInput()
   {
     this->currentRotationAxis = None;
   }
+
+  const float cameraSpeed = 0.05f; // adjust accordingly
+    if (state[SDL_SCANCODE_W]){
+       //zindex += 0.5f;
+        //cameraDirection += cameraSpeed * cameraRight;
+        /*if(zindex > 0){
+          zindex = 0;
+        }*/
+    }
+    if (state[SDL_SCANCODE_S]){
+      //zindex -= 0.5f;
+        //cameraDirection -= cameraSpeed * cameraRight;
+        
+    }
+   // if (state[SDL_SCANCODE_A])
+        //cameraDirection -= glm::normalize(glm::cross(cameraRight, cameraUp)) * cameraSpeed;
+   // if (state[SDL_SCANCODE_D])
+       // cameraDirection += glm::normalize(glm::cross(cameraRight, cameraUp)) * cameraSpeed;
 }
 
 void Game::Update()
@@ -225,53 +243,45 @@ void Game::Update()
   this->ticksCount = SDL_GetTicks();
 }
 
-float Game::computeCurrentScale()
-{
-  this->currentScale += 0.01 * this->scaleDirection;
-  if (this->currentScale <= 0 || this->currentScale >= 0.95)
-  {
-    this->scaleDirection *= -1;
-  }
-  return this->currentScale;
-}
+
 
 void Game::DoOutput()
 {
-  //glClearColor(0, 0, 0, 1.0f);
+  glClearColor(0, 0, 0, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   this->spriteShader->SetActive();
   
-  auto rotatedX = Matrix4::RotationMatrix(X, -90);
-  auto rotatedY = Matrix4::RotationMatrix(Y, -40);
+ 
   
-  Matrix4 transformMatrix = rotatedX * rotatedY;
-  Matrix4 tranlationM = Matrix4::Identity();
-  Matrix4 scaleM = Matrix4::Identity();
-  float scale =  0.77f;//this->computeCurrentScale();
-  Matrix4::Scale(scale, scaleM);
-  transformMatrix *= scaleM;
+  
+  glm::mat4 projection = glm::perspective(glm::radians(45.0f),(float)Width/ (float)Height, 0.1f,10.0f);
+  
+  
+ 
+  auto model =glm::mat4(1.0f);//glm::scale( glm::mat4(1.0f),glm::vec3(1.0f,1.0f,3.0f));;// glm::mat4(1.0f);//glm::scale(glm::mat4(1.0f),glm::vec3(0.50f));
+  model = glm::rotate(model, glm::radians(92.0f), glm::vec3(1.0f,0.0f,0.0f));
+  model = glm::rotate(model, glm::radians(this->rotationAngle), glm::vec3(0.0f,1.0f,0.0f));
+  this->rotationAngle += 1.0f;
+  if(this->rotationAngle > 360.0f){
+    this->rotationAngle = 0;
+  }
+  //model = glm::translate(model,glm::vec3(0.0f,0.0f,zindex));
 
+  Matrix4 transformMatrix = Matrix4(model);
   
-  if(this->currentRotationAxis != None ){
-    auto degrees = this->currentRotation;
-  this->currentRotation += 0.56f;
-  if(this->currentRotation>=360){
-    this->currentRotation = 0.01f;
-  }
-    auto rotatedY2 = Matrix4::RotationMatrix(this->currentRotationAxis, degrees);
-    transformMatrix *= rotatedY2;
-  }
-  //Matrix4 viewProj = Matrix4::CreateSimpleViewProj(Width,Height);
-  //Matrix4 fov = Matrix4::CreatePerspectiveFOV(0.0f,0.0f,600.0f,100.0f,100.0f);
-  //transformMatrix *= viewProj;
-  //transformMatrix *= fov;
+  //auto view1 = glm::lookAt(cameraDirection, cameraDirection + cameraRight, cameraUp);
+  auto view = glm::lookAt(glm::vec3(0.0f, 0.0f, -2.0f), 
+  		   glm::vec3(0.0f, 0.0f, 0.0f), 
+  		   glm::vec3(0.0f, 1.0f, 0.0f));
+  //cout << "zindex->" << zindex << endl;
+  projection = projection * view;
+  //cout << zindex << endl;
+  this->spriteShader->SetMatrixUniform("projectionMatrix", glm::value_ptr(projection));
+
   this->spriteShader->SetMatrixUniform("transformMatrix", transformMatrix.AsFloatPtr());
 
-  glDrawElements(GL_TRIANGLES, VertCount, GL_UNSIGNED_INT, nullptr);
+  glDrawElements(GL_TRIANGLES,VertCount , GL_UNSIGNED_INT, nullptr);
   glEnable(GL_DEPTH_TEST);
-  // glEnable(GL_BLEND);
-  // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   SDL_GL_SwapWindow(this->window);
-  // delete identity;
 }
