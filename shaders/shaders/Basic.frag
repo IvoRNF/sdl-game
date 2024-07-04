@@ -18,7 +18,7 @@ uniform sampler2D uTexture;
 void main()
 {
 	// RGBA of 100% blue, 100% opaque
-    outColor = fragColor;
-    //outColor = texture(uTexture, fragTexCoord);
+    //outColor = fragColor;
+    outColor = texture(uTexture, fragTexCoord);
     
 }

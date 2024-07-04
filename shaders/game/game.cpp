@@ -7,7 +7,7 @@
 #include "./Shader.h"
 #include "../../common/Math.h"
 #include <glm/ext/matrix_clip_space.hpp> // glm::perspective
-#include <glm/mat4x4.hpp> // glm::mat4
+#include <glm/mat4x4.hpp>                // glm::mat4
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -19,7 +19,7 @@ const int Height = 700;
 
 const int VertCount = 18;
 const int uniqueVertexCount = 18;
-const float zz1 = -18.0f; 
+const float zz1 = -2.5f;
 const float zz2 = -1.0f;
 
 Game::Game()
@@ -40,55 +40,42 @@ Game::Game()
 
       /* POS(3) - TEXTCORD(2) - COLOR(4)*/
       //-1.0f = -0.33f
-      //0.5 = 0.15
-      
+      // 0.5 = 0.15
 
       vertexBuffer{
           // first triangle LEFT
-              
-         
 
-          -0.5f, -0.5f, zz1,   0.2f, 0.0f,    1.000f, 0.0f, 0.0f,0.5f,
-          0.5f, -0.5f, zz1,    0.0f, 1.0f,     1.000f, 0.0f, 0.0f,0.5f,
-          -0.5f, 0.5f, zz1,    0.0f, 0.0f,     1.000f, 0.0f, 0.0f,0.5f,
-          
+          -0.5f, -0.5f, zz1, 0.2f, 0.0f, 1.000f, 0.0f, 0.0f, 0.5f,
+          0.5f, -0.5f, zz1, 0.0f, 1.0f, 1.000f, 0.0f, 0.0f, 0.5f,
+          -0.5f, 0.5f, zz1, 0.0f, 0.0f, 1.000f, 0.0f, 0.0f, 0.5f,
 
-          0.0f, 0.0f, zz2,      0.0f, 0.0f,    0.000f, 1.0f, 0.000f,0.5f,
-          0.5f, 0.5f, zz1,     1.0f, 1.0f,    0.000f, 1.0f, 0.000f,0.5f,
-          0.5f, -0.5f, zz1,    0.0f, 1.0f,    0.000f, 1.0f, 0.000f,0.5f,
+          0.0f, 0.0f, zz2, 0.0f, 0.0f, 0.000f, 1.0f, 0.000f, 0.5f,
+          0.5f, 0.5f, zz1, 1.0f, 1.0f, 0.000f, 1.0f, 0.000f, 0.5f,
+          0.5f, -0.5f, zz1, 0.0f, 1.0f, 0.000f, 1.0f, 0.000f, 0.5f,
 
-          -0.5f, 0.5f, zz1,    0.0f, 0.0f,    0.000f, 1.0f, 1.0f,0.5f,
-          0.5f, 0.5f, zz1,     1.0f, 0.0f,    0.000f, 1.0f, 1.0f,0.5f,
-          0.0f, 0.0f, zz2,      0.0f, 1.0f,    0.000f, 1.0f, 1.0f,0.5f,
+          -0.5f, 0.5f, zz1, 0.0f, 0.0f, 0.000f, 1.0f, 1.0f, 0.5f,
+          0.5f, 0.5f, zz1, 1.0f, 0.0f, 0.000f, 1.0f, 1.0f, 0.5f,
+          0.0f, 0.0f, zz2, 0.0f, 1.0f, 0.000f, 1.0f, 1.0f, 0.5f,
 
-          0.5f, -0.5f, zz1,    0.0f, 0.0f,    1.00f, 0.0f, 1.00f,0.5f,
-          -0.5f, -0.5f, zz1,   1.0f, 0.0f,    1.00f, 0.0f, 1.00f,0.5f,
-          0.0f, 0.0f, zz2,      0.0f, 1.0f,    1.00f, 0.0f, 1.00f,0.5f,
+          0.5f, -0.5f, zz1, 0.0f, 0.0f, 1.00f, 0.0f, 1.00f, 0.5f,
+          -0.5f, -0.5f, zz1, 1.0f, 0.0f, 1.00f, 0.0f, 1.00f, 0.5f,
+          0.0f, 0.0f, zz2, 0.0f, 1.0f, 1.00f, 0.0f, 1.00f, 0.5f,
 
-          -0.5f, -0.5f, zz1,   0.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          0.0f, 0.0f, zz2,      0.0f, 1.0f,    1.000f, 0.271f, 0.000f,0.5f,
-          -0.5f, 0.5f, zz1,    1.0f, 0.0f,    1.000f, 0.271f, 0.000f,0.5f 
-          
-          },
+          -0.5f, -0.5f, zz1, 0.0f, 0.0f, 1.000f, 0.271f, 0.000f, 0.5f,
+          0.0f, 0.0f, zz2, 0.0f, 1.0f, 1.000f, 0.271f, 0.000f, 0.5f,
+          -0.5f, 0.5f, zz1, 1.0f, 0.0f, 1.000f, 0.271f, 0.000f, 0.5f
+
+      },
 
       indexBuffer{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17},
       currentRotationAxis(None),
       currentRotation(0.10f),
-      cameraDirection{glm::vec3(0.0f, 0.0f,  3.0f)},
-      cameraRight{glm::vec3(0.0f, 0.0f, -1.0f)},
-      cameraUp{glm::vec3(1.0f, 0.0f,  0.0f)},
+      cameraPos{glm::vec3(0.0f, -3.0f, -4.0f)},
+      cameraFront{glm::vec3(0.0f, 0.0f, 4.0f)},
+      cameraUp{glm::vec3(0.0f, 1.0f, 0.0f)},
       rotationAngle(35.0f)
-  
+
 {
-
-   // std::memset(vertexBuffer,0,166);
-
-    glm::vec3 cameraTarget = glm::vec3(0.0f,0.0f, 0.0f);
-    cameraDirection = glm::normalize(cameraDirection - cameraTarget);
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
-    cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-    cameraUp = glm::cross(cameraDirection, cameraRight);
-    cameraRight = glm::vec3(0.0f, 0.0f, -1.0f);
 }
 bool Game::Init()
 {
@@ -106,7 +93,7 @@ bool Game::Init()
     SDL_Log("Failed to create window %s", SDL_GetError());
     return false;
   }
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,24);
+  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   this->context = SDL_GL_CreateContext(this->window);
   glewExperimental = GL_TRUE;
   if (glewInit() != GLEW_OK)
@@ -208,22 +195,32 @@ void Game::ProcessInput()
   }
 
   const float cameraSpeed = 0.05f; // adjust accordingly
-    if (state[SDL_SCANCODE_W]){
-       //zindex += 0.5f;
-        //cameraDirection += cameraSpeed * cameraRight;
-        /*if(zindex > 0){
-          zindex = 0;
-        }*/
-    }
-    if (state[SDL_SCANCODE_S]){
-      //zindex -= 0.5f;
-        //cameraDirection -= cameraSpeed * cameraRight;
-        
-    }
-   // if (state[SDL_SCANCODE_A])
-        //cameraDirection -= glm::normalize(glm::cross(cameraRight, cameraUp)) * cameraSpeed;
-   // if (state[SDL_SCANCODE_D])
-       // cameraDirection += glm::normalize(glm::cross(cameraRight, cameraUp)) * cameraSpeed;
+  if (state[SDL_SCANCODE_W])
+  {
+    cameraPos += cameraSpeed * cameraFront;
+  }
+  if (state[SDL_SCANCODE_S])
+  {
+    cameraPos -= cameraSpeed * cameraFront;
+  }
+  if (state[SDL_SCANCODE_A])
+  {
+    cameraPos -= glm::cross(cameraFront, cameraUp) * cameraSpeed;
+  }
+  if (state[SDL_SCANCODE_D])
+  {
+    cameraPos += glm::cross(cameraFront, cameraUp) * cameraSpeed;
+  }
+  if (state[SDL_SCANCODE_R])
+  {
+    cameraPos += cameraSpeed * cameraUp;
+    // cout << cameraPos[0] << "=X " << cameraPos[1] << "=Y " << cameraPos[2]<< "=Z" << endl;
+  }
+  if (state[SDL_SCANCODE_F])
+  {
+    cameraPos -= cameraSpeed * cameraUp;
+    // cout << cameraPos[0] << "=X " << cameraPos[1] << "=Y " << cameraPos[2]<< "=Z" << endl;
+  }
 }
 
 void Game::Update()
@@ -243,45 +240,32 @@ void Game::Update()
   this->ticksCount = SDL_GetTicks();
 }
 
-
-
 void Game::DoOutput()
 {
   glClearColor(0, 0, 0, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   this->spriteShader->SetActive();
-  
- 
-  
-  
-  glm::mat4 projection = glm::perspective(glm::radians(45.0f),(float)Width/ (float)Height, 0.1f,10.0f);
-  
-  
- 
-  auto model =glm::mat4(1.0f);//glm::scale( glm::mat4(1.0f),glm::vec3(1.0f,1.0f,3.0f));;// glm::mat4(1.0f);//glm::scale(glm::mat4(1.0f),glm::vec3(0.50f));
-  model = glm::rotate(model, glm::radians(92.0f), glm::vec3(1.0f,0.0f,0.0f));
-  model = glm::rotate(model, glm::radians(this->rotationAngle), glm::vec3(0.0f,1.0f,0.0f));
+
+  glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)Width / (float)Height, 0.1f, 100.0f);
+
+  auto model = glm::mat4(1.0f);
+  model = glm::rotate(model, glm::radians(92.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+  model = glm::rotate(model, glm::radians(this->rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+  model = glm::scale(model, glm::vec3(1.55f));
   this->rotationAngle += 1.0f;
-  if(this->rotationAngle > 360.0f){
+  if (this->rotationAngle > 360.0f)
+  {
     this->rotationAngle = 0;
   }
-  //model = glm::translate(model,glm::vec3(0.0f,0.0f,zindex));
 
-  Matrix4 transformMatrix = Matrix4(model);
-  
-  //auto view1 = glm::lookAt(cameraDirection, cameraDirection + cameraRight, cameraUp);
-  auto view = glm::lookAt(glm::vec3(0.0f, 0.0f, -2.0f), 
-  		   glm::vec3(0.0f, 0.0f, 0.0f), 
-  		   glm::vec3(0.0f, 1.0f, 0.0f));
-  //cout << "zindex->" << zindex << endl;
-  projection = projection * view;
-  //cout << zindex << endl;
+  auto view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+  // projection = projection * view;
   this->spriteShader->SetMatrixUniform("projectionMatrix", glm::value_ptr(projection));
+  this->spriteShader->SetMatrixUniform("viewMatrix", glm::value_ptr(view));
+  this->spriteShader->SetMatrixUniform("transformMatrix", glm::value_ptr(model));
 
-  this->spriteShader->SetMatrixUniform("transformMatrix", transformMatrix.AsFloatPtr());
-
-  glDrawElements(GL_TRIANGLES,VertCount , GL_UNSIGNED_INT, nullptr);
+  glDrawElements(GL_TRIANGLES, VertCount, GL_UNSIGNED_INT, nullptr);
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SwapWindow(this->window);
 }

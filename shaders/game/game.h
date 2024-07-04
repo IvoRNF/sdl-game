@@ -31,8 +31,8 @@ private:
     Texture *texture;
     float currentRotation;
     VecAxis currentRotationAxis;
-    glm::vec3 cameraDirection;
-    glm::vec3 cameraRight;
+    glm::vec3 cameraPos;
+    glm::vec3 cameraFront;
     glm::vec3 cameraUp;
     float rotationAngle;
    

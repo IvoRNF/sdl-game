@@ -16,6 +16,7 @@
 
 uniform mat4 transformMatrix;
 uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec2 inTexCoord;
 layout(location = 2) in vec4 inColor;
@@ -27,9 +28,10 @@ void main()
 	// The vertex shader needs to output a 4D
 	// coordinate.
 	// For now set the 4th coordinate to 1.0
-	vec4 pos = vec4(inPosition,1);
-    vec4 newPos = pos * projectionMatrix;
-	gl_Position = transformMatrix * newPos; 
+	vec4 pos = transformMatrix * vec4(inPosition,1) ;
+    vec4 newPos = pos * viewMatrix *  projectionMatrix;
+
+	gl_Position = /*transformMatrix **/ newPos; 
 	////gl_Position = pos * projectionMatrix * transformMatrix;
 	//gl_Position = transformMatrix * pos;
 	fragTexCoord = inTexCoord;

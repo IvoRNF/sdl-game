@@ -44,49 +44,7 @@ class Matrix4 {
         return &mat[0][0];
       }
       static const Matrix4 Instance;
-      static Matrix4 CreateSimpleViewProj(float width, float height)
-      {
-        float temp[4][4] =
-        {
-          { 2.0f/width, 0.0f, 0.0f, 0.0f },
-          { 0.0f, 2.0f/height, 0.0f, 0.0f },
-          { 0.0f, 0.0f, 1.0f, 0.0f },
-          { 0.0f, 0.0f, 1.0f, 1.0f }
-        };
-        return Matrix4(temp);
-      }
-      static Matrix4 CreatePerspectiveFOV(float fovY, float width, float height, float near, float far)
-      {
-        float yScale = 1 / tanf(fovY / 2.0f);
-        float xScale = yScale * height / width;
-        float temp[4][4] =
-        {
-          { xScale, 0.0f, 0.0f, 0.0f },
-          { 0.0f, yScale, 0.0f, 0.0f },
-          { 0.0f, 0.0f, far / (far - near), 1.0f },
-          { 0.0f, 0.0f, -near * far / (far - near), 0.0f }
-        };
-        return Matrix4(temp);
-      }
+      
       void print();
-      /*static Matrix4 CreateLookAt(const Vector3& eye, const Vector3& target, const Vector3& up)
-      {
-        Vector3 zaxis = Vector3::Normalize(target - eye);
-        Vector3 xaxis = Vector3::Normalize(Vector3::Cross(up, zaxis));
-        Vector3 yaxis = Vector3::Normalize(Vector3::Cross(zaxis, xaxis));
-        Vector3 trans;
-        trans.x = -Vector3::Dot(xaxis, eye);
-        trans.y = -Vector3::Dot(yaxis, eye);
-        trans.z = -Vector3::Dot(zaxis, eye);
-
-        float temp[4][4] =
-        {
-          { xaxis.x, yaxis.x, zaxis.x, 0.0f },
-          { xaxis.y, yaxis.y, zaxis.y, 0.0f },
-          { xaxis.z, yaxis.z, zaxis.z, 0.0f },
-          { trans.x, trans.y, trans.z, 1.0f }
-        };
-        return Matrix4(temp);
-      }*/
 };
 #endif
