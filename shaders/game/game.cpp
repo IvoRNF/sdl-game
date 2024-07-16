@@ -11,6 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 using namespace std;
 
@@ -73,9 +74,12 @@ Game::Game()
       cameraPos{glm::vec3(0.0f, -3.0f, -4.0f)},
       cameraFront{glm::vec3(0.0f, 0.0f, 4.0f)},
       cameraUp{glm::vec3(0.0f, 1.0f, 0.0f)},
-      rotationAngle(35.0f)
+      rotationAngle(35.0f),
+      yaw{90.0f},
+      pitch{0.0f}
 
 {
+  cameraRight = glm::cross(cameraFront, cameraUp);
 }
 bool Game::Init()
 {
@@ -205,21 +209,42 @@ void Game::ProcessInput()
   }
   if (state[SDL_SCANCODE_A])
   {
-    cameraPos -= glm::cross(cameraFront, cameraUp) * cameraSpeed;
+    cameraPos -= cameraRight * cameraSpeed;
   }
   if (state[SDL_SCANCODE_D])
   {
-    cameraPos += glm::cross(cameraFront, cameraUp) * cameraSpeed;
+    cameraPos += cameraRight * cameraSpeed;
   }
   if (state[SDL_SCANCODE_R])
   {
     cameraPos += cameraSpeed * cameraUp;
-    // cout << cameraPos[0] << "=X " << cameraPos[1] << "=Y " << cameraPos[2]<< "=Z" << endl;
   }
   if (state[SDL_SCANCODE_F])
   {
     cameraPos -= cameraSpeed * cameraUp;
-    // cout << cameraPos[0] << "=X " << cameraPos[1] << "=Y " << cameraPos[2]<< "=Z" << endl;
+  }
+
+  if (state[SDL_SCANCODE_T])
+  {
+    this->yaw += 1.0f;
+  }
+  if (state[SDL_SCANCODE_G])
+  {
+    this->yaw -= 1.0f;
+  }
+  if (state[SDL_SCANCODE_Y])
+  {
+    this->pitch += 1.0f;
+  }
+  if (state[SDL_SCANCODE_H])
+  {
+    this->pitch -= 1.0f;
+  }
+  if(this->pitch > 89.0f){
+    this->pitch = 89.0f;
+  }
+  if(this->pitch < -89.0f){
+    this->pitch = -89.0f;
   }
 }
 
@@ -250,16 +275,25 @@ void Game::DoOutput()
   glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)Width / (float)Height, 0.1f, 100.0f);
 
   auto model = glm::mat4(1.0f);
-  model = glm::rotate(model, glm::radians(92.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-  model = glm::rotate(model, glm::radians(this->rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+  glm::quat qX = glm::quat(glm::vec3(glm::radians(92.0f), 0.0f, 0.0f));
+  model = glm::toMat4(qX);
+  glm::quat qY = glm::quat(glm::vec3(0.0f, glm::radians(this->rotationAngle), 0.0f));
+  model = model * glm::toMat4(qY);
   model = glm::scale(model, glm::vec3(1.55f));
+
   this->rotationAngle += 1.0f;
   if (this->rotationAngle > 360.0f)
   {
     this->rotationAngle = 0;
   }
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+  direction.y = sin(glm::radians(this->pitch)); 
+  direction.z = sin(glm::radians(this->yaw)) * cos(glm::radians(pitch));
+  cameraFront = glm::normalize(direction);
+  glm::vec3 target = cameraPos + cameraFront;
 
-  auto view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+  auto view = glm::lookAt(cameraPos, target, cameraUp);
   // projection = projection * view;
   this->spriteShader->SetMatrixUniform("projectionMatrix", glm::value_ptr(projection));
   this->spriteShader->SetMatrixUniform("viewMatrix", glm::value_ptr(view));

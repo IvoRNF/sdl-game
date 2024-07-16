@@ -34,6 +34,8 @@ private:
     glm::vec3 cameraPos;
     glm::vec3 cameraFront;
     glm::vec3 cameraUp;
+    glm::vec3 cameraRight;
     float rotationAngle;
-   
+    float yaw; 
+    float pitch;
 };
