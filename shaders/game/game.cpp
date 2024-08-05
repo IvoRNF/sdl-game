@@ -12,11 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
-<<<<<<< Updated upstream
-
-=======
 #include "memory"
->>>>>>> Stashed changes
 using namespace std;
 
 const int Width = 1024;
@@ -30,25 +26,11 @@ const float zz2 = -1.0f;
 Game::Game()
     : window(nullptr), context(nullptr), ticksCount(0), running(true), vertexArray(nullptr),
       texture(nullptr),
-      /*vertexBuffer{
-          // first triangle LEFT
-          -0.5f,0.5f,-1.0f, 0.0f,0.0f,   1.000f, 0.271f, 0.000f,0.5f,//L
-          0.5f,0.5f,-1.0f,  1.0f,0.0f,   1.000f, 0.271f, 0.000f,0.5f,//R
-          0.5f,-0.5f,-1.0f,  0.0f,1.0f,  1.000f, 0.271f, 0.000f,0.5f,//B
-
-
-          -0.5f,-0.5f,-1.0f,  0.2f,0.0f,  1.000f, 0.271f, 0.000f,0.5f,//L
-
-          0.0f,0.0f,0.5f, 0.0f,0.0f,1.000f, 0.271f, 0.000f,0.5f
-      },
-      indexBuffer{0, 1, 2,    3,2,0,  4,1,2,   0,1,4,  2,3,4,  3,4,0},*/
+      /**/
 
       /* POS(3) - TEXTCORD(2) - COLOR(4)*/
-      //-1.0f = -0.33f
-      // 0.5 = 0.15
 
       vertexBuffer{
-          // first triangle LEFT
 
           -0.5f, -0.5f, zz1, 0.2f, 0.0f, 1.000f, 0.0f, 0.0f, 0.5f,
           0.5f, -0.5f, zz1, 0.0f, 1.0f, 1.000f, 0.0f, 0.0f, 0.5f,
@@ -233,7 +215,6 @@ void Game::ProcessInput()
   if (state[SDL_SCANCODE_F])
   {
     cameraPos -= cameraSpeed * cameraUp;
-<<<<<<< Updated upstream
   }
 
   if (state[SDL_SCANCODE_T])
@@ -252,13 +233,13 @@ void Game::ProcessInput()
   {
     this->pitch -= 1.0f;
   }
-  if(this->pitch > 89.0f){
+  if (this->pitch > 89.0f)
+  {
     this->pitch = 89.0f;
   }
-  if(this->pitch < -89.0f){
+  if (this->pitch < -89.0f)
+  {
     this->pitch = -89.0f;
-=======
->>>>>>> Stashed changes
   }
 }
 
@@ -302,11 +283,7 @@ void Game::DoOutput()
   }
   glm::vec3 direction;
   direction.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
-<<<<<<< Updated upstream
-  direction.y = sin(glm::radians(this->pitch)); 
-=======
   direction.y = sin(glm::radians(this->pitch));
->>>>>>> Stashed changes
   direction.z = sin(glm::radians(this->yaw)) * cos(glm::radians(pitch));
   cameraFront = glm::normalize(direction);
   glm::vec3 target = cameraPos + cameraFront;

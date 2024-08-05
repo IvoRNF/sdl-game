@@ -39,8 +39,6 @@ private:
     float rotationAngle;
     float yaw; 
     float pitch;
-<<<<<<< Updated upstream
-=======
 
     void yawAndPitchMouse();
 
@@ -51,5 +49,4 @@ private:
     int lastMouseY;
 
     bool firstMouse;
->>>>>>> Stashed changes
 };
