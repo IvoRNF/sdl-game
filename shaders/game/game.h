@@ -6,6 +6,7 @@
 #include "../../common/Math.h"
 #include "../../common/Texture.h"
 #include <glm/glm.hpp>
+#include <memory>
 class Game
 {
 
@@ -24,13 +25,13 @@ private:
     Uint32 ticksCount;
     SDL_GLContext context;
     bool running;
-    VertexArray *vertexArray;
+    std::unique_ptr<VertexArray> vertexArray;
     float vertexBuffer[166];
     unsigned int indexBuffer[18];
-    Shader *spriteShader;
-    Texture *texture;
+    std::unique_ptr<Shader> spriteShader;
+    std::unique_ptr<Texture> texture;
     float currentRotation;
-    VecAxis currentRotationAxis;
+
     glm::vec3 cameraPos;
     glm::vec3 cameraFront;
     glm::vec3 cameraUp;
@@ -38,4 +39,17 @@ private:
     float rotationAngle;
     float yaw; 
     float pitch;
+<<<<<<< Updated upstream
+=======
+
+    void yawAndPitchMouse();
+
+    float mouseChangeX;
+    float mouseChangeY;
+
+    int lastMouseX;
+    int lastMouseY;
+
+    bool firstMouse;
+>>>>>>> Stashed changes
 };

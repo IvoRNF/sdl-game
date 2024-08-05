@@ -12,7 +12,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
+<<<<<<< Updated upstream
 
+=======
+#include "memory"
+>>>>>>> Stashed changes
 using namespace std;
 
 const int Width = 1024;
@@ -69,7 +73,6 @@ Game::Game()
       },
 
       indexBuffer{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17},
-      currentRotationAxis(None),
       currentRotation(0.10f),
       cameraPos{glm::vec3(0.0f, -3.0f, -4.0f)},
       cameraFront{glm::vec3(0.0f, 0.0f, 4.0f)},
@@ -107,16 +110,16 @@ bool Game::Init()
   }
   glGetError();
 
-  this->vertexArray = new VertexArray(vertexBuffer, uniqueVertexCount, indexBuffer, VertCount);
+  this->vertexArray = std::unique_ptr<VertexArray>(new VertexArray(vertexBuffer, uniqueVertexCount, indexBuffer, VertCount));
 
-  this->spriteShader = new Shader();
+  this->spriteShader = std::unique_ptr<Shader>(new Shader());
   if (!this->spriteShader->Load("./shaders/Transform.vert", "./shaders/Basic.frag"))
   {
     SDL_Log("Cannot load shaders files.");
     return false;
   }
 
-  this->texture = new Texture();
+  this->texture = std::unique_ptr<Texture>(new Texture());
 
   this->texture->Load("./assets/wall.png");
 
@@ -157,9 +160,34 @@ void Game::ShutDown()
   SDL_GL_DeleteContext(this->context);
   SDL_DestroyWindow(this->window);
   SDL_Quit();
-  delete this->vertexArray;
-  // delete this->spriteShader;
-  delete this->texture;
+}
+
+void Game::yawAndPitchMouse()
+{
+  int mouseX = 0;
+  int mouseY = 0;
+  SDL_GetRelativeMouseState(&mouseX, &mouseY);
+  if (this->firstMouse)
+  {
+    this->lastMouseX = mouseX;
+    this->lastMouseY = mouseY;
+    this->firstMouse = false;
+  }
+  float sensitivity = 0.03f;
+  this->mouseChangeX = (mouseX - this->lastMouseX) * sensitivity;
+  this->mouseChangeY = (mouseY - this->lastMouseY) * sensitivity;
+
+  this->pitch += -this->mouseChangeY;
+  this->yaw += this->mouseChangeX;
+
+  if (this->pitch > 89.0f)
+  {
+    this->pitch = 89.0f;
+  }
+  if (this->pitch < -89.0f)
+  {
+    this->pitch = -89.0f;
+  }
 }
 
 void Game::ProcessInput()
@@ -174,28 +202,11 @@ void Game::ProcessInput()
     }
   }
   auto state = SDL_GetKeyboardState(NULL);
+
+  yawAndPitchMouse();
   if (state[SDL_SCANCODE_ESCAPE])
   {
     this->running = false;
-  }
-  if (state[SDL_SCANCODE_Z])
-  {
-    this->currentRotationAxis = Z;
-  }
-
-  if (state[SDL_SCANCODE_X])
-  {
-    this->currentRotationAxis = X;
-  }
-
-  if (state[SDL_SCANCODE_Y])
-  {
-    this->currentRotationAxis = Y;
-  }
-
-  if (state[SDL_SCANCODE_N])
-  {
-    this->currentRotationAxis = None;
   }
 
   const float cameraSpeed = 0.05f; // adjust accordingly
@@ -222,6 +233,7 @@ void Game::ProcessInput()
   if (state[SDL_SCANCODE_F])
   {
     cameraPos -= cameraSpeed * cameraUp;
+<<<<<<< Updated upstream
   }
 
   if (state[SDL_SCANCODE_T])
@@ -245,6 +257,8 @@ void Game::ProcessInput()
   }
   if(this->pitch < -89.0f){
     this->pitch = -89.0f;
+=======
+>>>>>>> Stashed changes
   }
 }
 
@@ -288,7 +302,11 @@ void Game::DoOutput()
   }
   glm::vec3 direction;
   direction.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
+<<<<<<< Updated upstream
   direction.y = sin(glm::radians(this->pitch)); 
+=======
+  direction.y = sin(glm::radians(this->pitch));
+>>>>>>> Stashed changes
   direction.z = sin(glm::radians(this->yaw)) * cos(glm::radians(pitch));
   cameraFront = glm::normalize(direction);
   glm::vec3 target = cameraPos + cameraFront;
