@@ -7,6 +7,8 @@
 #include "../../common/Texture.h"
 #include <glm/glm.hpp>
 #include <memory>
+#include <vector>
+
 class Game
 {
 
@@ -15,6 +17,7 @@ public:
     bool Init();
     void Loop();
     void ShutDown();
+    void loadPyramidAsset();
 
 private:
     void ProcessInput();
@@ -26,8 +29,9 @@ private:
     SDL_GLContext context;
     bool running;
     std::unique_ptr<VertexArray> vertexArray;
-    float vertexBuffer[166];
-    unsigned int indexBuffer[18];
+    std::unique_ptr<float> vertexBuffer;
+    std::vector< float > *verts;
+    unsigned int indexBuffer[15];
     std::unique_ptr<Shader> spriteShader;
     std::unique_ptr<Texture> texture;
     float currentRotation;

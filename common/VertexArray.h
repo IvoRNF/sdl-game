@@ -11,7 +11,7 @@
 class VertexArray
 {
 public:
-	VertexArray(float* verts, int numVerts,
+	VertexArray(void * verts, int numVerts,
 		unsigned int* indices, int numIndices);
 	~VertexArray();
 

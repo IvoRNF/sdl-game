@@ -9,7 +9,7 @@
 #include "VertexArray.h"
 #include <GL/glew.h>
 
-VertexArray::VertexArray(float* verts, int numVerts,
+VertexArray::VertexArray(void * verts, int numVerts,
 	unsigned int* indices, int numIndices)
 	:mNumVerts(numVerts)
 	,mNumIndices(numIndices)
@@ -21,7 +21,7 @@ VertexArray::VertexArray(float* verts, int numVerts,
 	// Create vertex buffer
 	glGenBuffers(1, &mVertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, numVerts * 9 * sizeof(float), verts, GL_STATIC_DRAW);
+	 glBufferData(GL_ARRAY_BUFFER, numVerts * 9 * sizeof(float), verts, GL_STATIC_DRAW);
 
 	// Create index buffer
 	glGenBuffers(1, &mIndexBuffer);

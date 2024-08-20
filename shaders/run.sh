@@ -14,4 +14,5 @@ eval $cmd
 # sudo apt-get install libglew-dev
 # sudo apt-get install libsoil-dev
 # sudo apt install libglm-dev
+# sudo apt-get install rapidjson-dev
 

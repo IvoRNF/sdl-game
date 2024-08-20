@@ -13,48 +13,29 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "memory"
-using namespace std;
+#include "rapidjson/document.h"
+#include <fstream>
+#include <vector>
 
+
+using namespace std;
+using namespace rapidjson;
 const int Width = 1024;
 const int Height = 700;
-
-const int VertCount = 18;
-const int uniqueVertexCount = 18;
+/**/
+/* POS(3) - TEXTCORD(2) - COLOR(4)*/
+const int VertCount = 15;
+const int uniqueVertexCount = 15;
+const int ColumnsCount = 9;
 const float zz1 = -2.5f;
 const float zz2 = -1.0f;
 
 Game::Game()
     : window(nullptr), context(nullptr), ticksCount(0), running(true), vertexArray(nullptr),
       texture(nullptr),
-      /**/
-
-      /* POS(3) - TEXTCORD(2) - COLOR(4)*/
-
-      vertexBuffer{
-
-          -0.5f, -0.5f, zz1, 0.2f, 0.0f, 1.000f, 0.0f, 0.0f, 0.5f,
-          0.5f, -0.5f, zz1, 0.0f, 1.0f, 1.000f, 0.0f, 0.0f, 0.5f,
-          -0.5f, 0.5f, zz1, 0.0f, 0.0f, 1.000f, 0.0f, 0.0f, 0.5f,
-
-          0.0f, 0.0f, zz2, 0.0f, 0.0f, 0.000f, 1.0f, 0.000f, 0.5f,
-          0.5f, 0.5f, zz1, 1.0f, 1.0f, 0.000f, 1.0f, 0.000f, 0.5f,
-          0.5f, -0.5f, zz1, 0.0f, 1.0f, 0.000f, 1.0f, 0.000f, 0.5f,
-
-          -0.5f, 0.5f, zz1, 0.0f, 0.0f, 0.000f, 1.0f, 1.0f, 0.5f,
-          0.5f, 0.5f, zz1, 1.0f, 0.0f, 0.000f, 1.0f, 1.0f, 0.5f,
-          0.0f, 0.0f, zz2, 0.0f, 1.0f, 0.000f, 1.0f, 1.0f, 0.5f,
-
-          0.5f, -0.5f, zz1, 0.0f, 0.0f, 1.00f, 0.0f, 1.00f, 0.5f,
-          -0.5f, -0.5f, zz1, 1.0f, 0.0f, 1.00f, 0.0f, 1.00f, 0.5f,
-          0.0f, 0.0f, zz2, 0.0f, 1.0f, 1.00f, 0.0f, 1.00f, 0.5f,
-
-          -0.5f, -0.5f, zz1, 0.0f, 0.0f, 1.000f, 0.271f, 0.000f, 0.5f,
-          0.0f, 0.0f, zz2, 0.0f, 1.0f, 1.000f, 0.271f, 0.000f, 0.5f,
-          -0.5f, 0.5f, zz1, 1.0f, 0.0f, 1.000f, 0.271f, 0.000f, 0.5f
-
-      },
-
-      indexBuffer{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17},
+      
+      vertexBuffer{ std::unique_ptr<float>( new float(VertCount * ColumnsCount) )},
+      indexBuffer{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},
       currentRotation(0.10f),
       cameraPos{glm::vec3(0.0f, -3.0f, -4.0f)},
       cameraFront{glm::vec3(0.0f, 0.0f, 4.0f)},
@@ -62,10 +43,42 @@ Game::Game()
       rotationAngle(35.0f),
       yaw{90.0f},
       pitch{0.0f}
-
 {
+  this->verts = new std::vector< float >(15 * 9,0.0f);
   cameraRight = glm::cross(cameraFront, cameraUp);
+  this->loadPyramidAsset();
 }
+
+void Game::loadPyramidAsset(){
+  string fname = "./assets/pyramid.json";
+  std::ifstream fileLoaded(fname, std::ios::in | std::ios::binary | std::ios::ate);
+  if(!fileLoaded.is_open()){
+     cerr << printf("file %s not found ",fname.c_str()) << endl;
+     return;
+  }
+  std::ifstream::pos_type fileSz = fileLoaded.tellg();
+  fileLoaded.seekg(0,std::ios::beg);
+  std::vector<char> bytes(static_cast<size_t>(fileSz) + 1);
+  fileLoaded.read(bytes.data(),static_cast<size_t>(fileSz));
+  Document doc;
+  doc.Parse(bytes.data());
+  if(!doc.IsArray()){
+    cerr << printf("%s is not an array",fname.c_str()) << endl;
+  }
+  auto arr = doc.GetArray();
+  if(arr.Size() == 0){
+    return;
+  }
+  for(unsigned int i = 0 ; i < arr.Size(); i++){
+    auto value  = arr[i].GetArray();
+    for(unsigned int j = 0 ; j < value.Size() ; j++){
+      auto num = value[j].GetFloat();
+      this->vertexBuffer.get()[i * value.Size() + j] = num;
+    }
+  }
+  cout<< "loaded sucess json"  << endl;
+}
+
 bool Game::Init()
 {
   int sdlResult = SDL_Init(SDL_INIT_VIDEO);
@@ -76,7 +89,7 @@ bool Game::Init()
   }
   this->setOpenGLAttributes();
 
-  this->window = SDL_CreateWindow("OPENGL Game programming C++ 2024", 1900, 0, Width, Height, SDL_WINDOW_OPENGL);
+  this->window = SDL_CreateWindow("OPENGL Game programming C++ ", 1900, 0, Width, Height, SDL_WINDOW_OPENGL);
   if (!this->window)
   {
     SDL_Log("Failed to create window %s", SDL_GetError());
@@ -91,8 +104,7 @@ bool Game::Init()
     return false;
   }
   glGetError();
-
-  this->vertexArray = std::unique_ptr<VertexArray>(new VertexArray(vertexBuffer, uniqueVertexCount, indexBuffer, VertCount));
+  this->vertexArray =  std::unique_ptr<VertexArray>(new VertexArray( this->vertexBuffer.get(), uniqueVertexCount, indexBuffer, VertCount));
 
   this->spriteShader = std::unique_ptr<Shader>(new Shader());
   if (!this->spriteShader->Load("./shaders/Transform.vert", "./shaders/Basic.frag"))
@@ -289,7 +301,6 @@ void Game::DoOutput()
   glm::vec3 target = cameraPos + cameraFront;
 
   auto view = glm::lookAt(cameraPos, target, cameraUp);
-  // projection = projection * view;
   this->spriteShader->SetMatrixUniform("projectionMatrix", glm::value_ptr(projection));
   this->spriteShader->SetMatrixUniform("viewMatrix", glm::value_ptr(view));
   this->spriteShader->SetMatrixUniform("transformMatrix", glm::value_ptr(model));
