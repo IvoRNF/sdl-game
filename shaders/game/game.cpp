@@ -24,18 +24,14 @@ const int Width = 1024;
 const int Height = 700;
 /**/
 /* POS(3) - TEXTCORD(2) - COLOR(4)*/
-const int VertCount = 15;
-const int uniqueVertexCount = 15;
-const int ColumnsCount = 9;
-const float zz1 = -2.5f;
-const float zz2 = -1.0f;
+
+
 
 Game::Game()
     : window(nullptr), context(nullptr), ticksCount(0), running(true), vertexArray(nullptr),
       texture(nullptr),
-      
-      vertexBuffer{ std::unique_ptr<float>( new float(VertCount * ColumnsCount) )},
-      indexBuffer{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14},
+      vertexBuffer{ std::vector<float>()},
+      indexBuffer{ std::vector<int>() },
       currentRotation(0.10f),
       cameraPos{glm::vec3(0.0f, -3.0f, -4.0f)},
       cameraFront{glm::vec3(0.0f, 0.0f, 4.0f)},
@@ -44,7 +40,6 @@ Game::Game()
       yaw{90.0f},
       pitch{0.0f}
 {
-  this->verts = new std::vector< float >(15 * 9,0.0f);
   cameraRight = glm::cross(cameraFront, cameraUp);
   this->loadPyramidAsset();
 }
@@ -69,11 +64,24 @@ void Game::loadPyramidAsset(){
   if(arr.Size() == 0){
     return;
   }
-  for(unsigned int i = 0 ; i < arr.Size(); i++){
+  
+  this->vertexCount = arr.Size();
+  this->uniqueVertexCount = this->vertexCount;
+  this->columnsCount =  arr[0].GetArray().Size();
+  cout<< "vertex count " << this->vertexCount << endl;
+  cout << "cols count "<< this->columnsCount << endl;
+  
+  this->indexBuffer.reserve(this->vertexCount);
+  for(size_t i = 0; i < this->vertexCount ; i++){
+    this->indexBuffer[i] = i;
+  }
+  this->vertexBuffer.reserve(this->vertexCount * this->columnsCount);
+
+  for(size_t i = 0 ; i < arr.Size(); i++){
     auto value  = arr[i].GetArray();
-    for(unsigned int j = 0 ; j < value.Size() ; j++){
+    for(size_t j = 0 ; j < value.Size() ; j++){
       auto num = value[j].GetFloat();
-      this->vertexBuffer.get()[i * value.Size() + j] = num;
+      this->vertexBuffer[i * value.Size() + j] = num;
     }
   }
   cout<< "loaded sucess json"  << endl;
@@ -104,7 +112,7 @@ bool Game::Init()
     return false;
   }
   glGetError();
-  this->vertexArray =  std::unique_ptr<VertexArray>(new VertexArray( this->vertexBuffer.get(), uniqueVertexCount, indexBuffer, VertCount));
+  this->vertexArray =  std::unique_ptr<VertexArray>(new VertexArray( this->vertexBuffer.data(), uniqueVertexCount, indexBuffer.data(), this->vertexCount, this->columnsCount));
 
   this->spriteShader = std::unique_ptr<Shader>(new Shader());
   if (!this->spriteShader->Load("./shaders/Transform.vert", "./shaders/Basic.frag"))
@@ -305,7 +313,7 @@ void Game::DoOutput()
   this->spriteShader->SetMatrixUniform("viewMatrix", glm::value_ptr(view));
   this->spriteShader->SetMatrixUniform("transformMatrix", glm::value_ptr(model));
 
-  glDrawElements(GL_TRIANGLES, VertCount, GL_UNSIGNED_INT, nullptr);
+  glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SwapWindow(this->window);
 }

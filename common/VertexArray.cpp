@@ -10,7 +10,7 @@
 #include <GL/glew.h>
 
 VertexArray::VertexArray(void * verts, int numVerts,
-	unsigned int* indices, int numIndices)
+	int * indices, int numIndices, int rowSize)
 	:mNumVerts(numVerts)
 	,mNumIndices(numIndices)
 {
@@ -21,7 +21,7 @@ VertexArray::VertexArray(void * verts, int numVerts,
 	// Create vertex buffer
 	glGenBuffers(1, &mVertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-	 glBufferData(GL_ARRAY_BUFFER, numVerts * 9 * sizeof(float), verts, GL_STATIC_DRAW);
+	 glBufferData(GL_ARRAY_BUFFER, numVerts * rowSize * sizeof(float), verts, GL_STATIC_DRAW);
 
 	// Create index buffer
 	glGenBuffers(1, &mIndexBuffer);
@@ -32,13 +32,12 @@ VertexArray::VertexArray(void * verts, int numVerts,
 	// (For now, assume one vertex format)
 	// Position is 3 floats starting at offset 0
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * rowSize, 0);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9 ,
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * rowSize ,
 		reinterpret_cast<void*>(sizeof(float) * 3));
-
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(float) *  9,
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(float) *  rowSize,
 		reinterpret_cast<void*>(sizeof(float) * 5));	
 
 }

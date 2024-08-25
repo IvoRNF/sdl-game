@@ -12,7 +12,7 @@ class VertexArray
 {
 public:
 	VertexArray(void * verts, int numVerts,
-		unsigned int* indices, int numIndices);
+		int * indices, int numIndices, int rowSize);
 	~VertexArray();
 
 	// Activate this vertex array (so we can draw it)

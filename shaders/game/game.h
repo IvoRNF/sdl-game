@@ -29,9 +29,11 @@ private:
     SDL_GLContext context;
     bool running;
     std::unique_ptr<VertexArray> vertexArray;
-    std::unique_ptr<float> vertexBuffer;
-    std::vector< float > *verts;
-    unsigned int indexBuffer[15];
+    std::vector<float> vertexBuffer;
+    std::vector<int> indexBuffer;
+    int vertexCount = 0;
+    int uniqueVertexCount = 0;
+    int columnsCount = 0;
     std::unique_ptr<Shader> spriteShader;
     std::unique_ptr<Texture> texture;
     float currentRotation;
