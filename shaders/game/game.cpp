@@ -42,6 +42,7 @@ Game::Game()
 {
   cameraRight = glm::cross(cameraFront, cameraUp);
   this->loadPyramidAsset();
+  this->model.loadModel("./assets/airplane/11803_Airplane_v1_l1.obj");
 }
 
 void Game::loadPyramidAsset(){

@@ -8,11 +8,12 @@ for f in ./**/*.cpp ./*.cpp ../common/*.cpp; do
 done;
 
 prms=$(find ./build -type f -exec echo {} +)
-cmd="g++ -o ./main $prms -lSOIL -lGL -lGLEW -lSDL2"
+cmd="g++ -o ./main $prms -lassimp -lSOIL -lGL -lGLEW -lSDL2 "
 eval $cmd
 ./main & echo "runned"
 # sudo apt-get install libglew-dev
 # sudo apt-get install libsoil-dev
 # sudo apt install libglm-dev
 # sudo apt-get install rapidjson-dev
+# sudo apt-get install libassimp-dev
 

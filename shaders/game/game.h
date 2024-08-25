@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
-
+#include "./model.h"
 class Game
 {
 
@@ -37,7 +37,7 @@ private:
     std::unique_ptr<Shader> spriteShader;
     std::unique_ptr<Texture> texture;
     float currentRotation;
-
+     
     glm::vec3 cameraPos;
     glm::vec3 cameraFront;
     glm::vec3 cameraUp;
@@ -45,6 +45,7 @@ private:
     float rotationAngle;
     float yaw; 
     float pitch;
+    Model model;
 
     void yawAndPitchMouse();
 
