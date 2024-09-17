@@ -21,6 +21,7 @@ public:
 	// Set this as the active shader program
 	void SetActive();
 	void SetMatrixUniform(const char * name, float * matrix4);
+	void setInt(const std::string &name, int value);
 private:
 	// Tries to compile the specified shader
 	bool CompileShader(const std::string& fileName,

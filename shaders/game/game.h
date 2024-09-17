@@ -24,6 +24,7 @@ private:
     void Update();
     void DoOutput();
     void setOpenGLAttributes();
+    void loadAirplane();
     SDL_Window *window;
     Uint32 ticksCount;
     SDL_GLContext context;
@@ -48,6 +49,7 @@ private:
     Model model;
 
     void yawAndPitchMouse();
+    void Draw() ;
 
     float mouseChangeX;
     float mouseChangeY;
