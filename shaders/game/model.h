@@ -3,29 +3,18 @@
 #include <assimp/postprocess.h>
 #include <iostream>
 #include <SOIL/SOIL.h>
-#include <glm/glm.hpp>
-#include "stb/stb_image.h"
-#include <SOIL/SOIL.h>
 
 using namespace std;
 
-struct ModelTexture
-{
+struct ModelTexture{
   unsigned int id;
   string type;
-  const char *path;
+  const char * path;
 };
 
 class Model
 {
-
-public: 
-  vector<ModelTexture> textures;
-  vector<glm::vec3> vertex;
-  vector<glm::vec2> textCord;
-  vector<int> indexs;
 private:
-
   string directory;
 
 public:
@@ -41,9 +30,6 @@ public:
     directory = path.substr(0, path.find_last_of('/'));
     std::cout << "load model success " << path << endl;
     this->processNode(scene->mRootNode, scene);
-    
-    
-
   }
 
   void processNode(aiNode *node, const aiScene *scene)
@@ -52,7 +38,6 @@ public:
     for (int i = 0; i < node->mNumMeshes; i++)
     {
       auto mesh = scene->mMeshes[node->mMeshes[i]];
-      
       this->processMesh(mesh, scene);
     }
     for (int i = 0; i < node->mNumChildren; i++)
@@ -91,10 +76,7 @@ public:
       aiString str;
       mat->GetTexture(type, i, &str);
       ModelTexture texture;
-      str = "12281_Container_diffuse.png";
-      cout << "texture from file..." << endl;
       texture.id = TextureFromFile(str.C_Str(), this->directory, false);
-
       texture.type = typeName;
       texture.path = str.C_Str();
       textures.push_back(texture);
@@ -106,89 +88,53 @@ public:
   {
     string filename = string(path);
     filename = directory + '/' + filename;
-    
+
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
-   int width, height, nrComponents;
+    int width, height, nrComponents;
+    // unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
     unsigned char *data = SOIL_load_image(filename.c_str(),
-										   &width, &height, &nrComponents, SOIL_LOAD_AUTO);
-    
-    
-    //stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    //if(stbi_failure_reason())
-      // std::cout << stbi_failure_reason();
+                                          &width, &height, &nrComponents, SOIL_LOAD_AUTO);
     if (data)
     {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
+      GLenum format;
+      if (nrComponents == 1)
+        format = GL_RED;
+      else if (nrComponents == 3)
+        format = GL_RGB;
+      else if (nrComponents == 4)
+        format = GL_RGBA;
 
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+      glBindTexture(GL_TEXTURE_2D, textureID);
+      glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+      glGenerateMipmap(GL_TEXTURE_2D);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        
-       // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixmap);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-      //  glHint(GL_GENERATE_MIPMAP_HINT, GL_FASTEST);//GL_FASTEST);
-       // glGenerateMipmap(GL_TEXTURE_2D); // Generate mip mapping
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        //stbi_image_free(data);
-        
-        
+      SOIL_free_image_data(data);
     }
     else
     {
-        std::cout << "Texture failed to load at path: " <<filename << std::endl;
-        SOIL_free_image_data(data);
-        //stbi_image_free(data);
+      std::cout << "Texture failed to load at path: " << path << std::endl;
+      SOIL_free_image_data(data);
     }
 
     return textureID;
-    
-     
   }
   void processMesh(aiMesh *mesh, const aiScene *scene)
   {
 
     // cout << "num vertexis " << mesh->mNumVertices << endl;
-    for(unsigned int i = 0; i < mesh->mNumFaces; i++)
-    {
-        aiFace face = mesh->mFaces[i];
-        for(unsigned int j = 0; j < face.mNumIndices; j++)
-            indexs.push_back(face.mIndices[j]);
-    }
+    vector<ModelTexture> textures;
     for (int i = 0; i < mesh->mNumVertices; i++)
     {
+      // printSample(mesh,i);
 
-      auto vert = mesh->mVertices[i];
-      
-      glm::vec3 vertex;
-      vertex.x = vert.x;
-      vertex.y = vert.y;
-      vertex.z = vert.z;
-      this->vertex.push_back(vertex);
-
-      auto texture = mesh->mTextureCoords[0];
-      glm::vec2 vec2{0.0f,0.0f};
-      if (texture)
-      {
-        vec2.x = texture->x;
-        vec2.y = texture->y;
-        
-      }
-      this->textCord.push_back(vec2); 
+      // break;
     }
 
     // process materials
@@ -201,9 +147,9 @@ public:
     // normal: texture_normalN
 
     // 1. diffuse maps
-    vector<ModelTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+    /*vector<ModelTexture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-   /* // 2. specular maps
+    // 2. specular maps
     vector<ModelTexture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     // 3. normal maps

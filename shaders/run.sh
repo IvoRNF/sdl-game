@@ -16,5 +16,4 @@ eval $cmd
 # sudo apt install libglm-dev
 # sudo apt-get install rapidjson-dev
 # sudo apt-get install libassimp-dev
-# git clone https://github.com/nothings/stb.git
 

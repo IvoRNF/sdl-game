@@ -24,7 +24,7 @@ const int Width = 1024;
 const int Height = 700;
 /**/
 /* POS(3) - TEXTCORD(2) - COLOR(4)*/
-const float initY = 10.0f;
+
 
 
 Game::Game()
@@ -33,77 +33,17 @@ Game::Game()
       vertexBuffer{ std::vector<float>()},
       indexBuffer{ std::vector<int>() },
       currentRotation(0.10f),
-      cameraPos{glm::vec3(0.0f, 0.0f, -initY)},
-      cameraFront{glm::vec3(0.0f, 0.0f, initY)},
+      cameraPos{glm::vec3(0.0f, -3.0f, -4.0f)},
+      cameraFront{glm::vec3(0.0f, 0.0f, 4.0f)},
       cameraUp{glm::vec3(0.0f, 1.0f, 0.0f)},
       rotationAngle(35.0f),
       yaw{90.0f},
       pitch{0.0f}
 {
   cameraRight = glm::cross(cameraFront, cameraUp);
- // this->loadPyramidAsset();
-  this->loadAirplane();
+  this->loadPyramidAsset();
+  this->model.loadModel("./assets/airplane/11803_Airplane_v1_l1.obj");
 }
-
-void Game::loadAirplane(){
-  string path = "./assets/container/12281_Container_v2_L2.obj";
-  this->model.loadModel(path);
-  cout << "vertex buffer size" << this->model.vertex.size() << endl;
-  cout << " texture cord. size " << this->model.textCord.size() << endl;
-  cout << "textures size" << this->model.textures.size() << endl;
-  cout << "index buffer size" <<this->model.indexs.size() << endl;
-  this->vertexCount = this->model.vertex.size();
-  this->uniqueVertexCount = this->vertexCount;
-  this->columnsCount = 9;
-  auto indexSz = this->model.indexs.size();
-  this->indexBuffer.reserve(indexSz);
-  for(size_t i = 0; i < indexSz ; i++){
-    this->indexBuffer[i] = this->model.indexs[i];
-  }
-  this->vertexBuffer.reserve(this->vertexCount * this->columnsCount);
-  int z = 0;
-  for(int i = 0; i < this->vertexCount ; i++){
-    auto textCord = this->model.textCord[i];
-    auto vert = this->model.vertex[i];
-     //cout << "x-cord:" << textCord.x << "y-cord" << textCord.y << endl;
-    vector<float> values{ vert.x , vert.y, vert.z ,textCord.x,textCord.y ,0.0f,200.0f,0.0f,0.0f};  
-    for(auto value : values){
-      this->vertexBuffer[z] = value;
-      //cout << value << " ";
-      z++;
-    }
-    //cout << endl;
-  }    
-}
-
-void Game::Draw() 
-{
-    unsigned int diffuseNr = 1;
-    unsigned int specularNr = 1;
-    auto textures = this->model.textures;
-    cout << this->model.textures.size() << endl;
-    for(unsigned int i = 0; i < textures.size(); i++)
-    {
-        glActiveTexture(GL_TEXTURE0 + i); // activate proper texture unit before binding
-        // retrieve texture number (the N in diffuse_textureN)
-        string number;
-        string name = textures[i].type;
-        if(name == "texture_diffuse")
-            number = std::to_string(diffuseNr++);
-        else if(name == "texture_specular")
-            number = std::to_string(specularNr++);
-        auto shader = *this->spriteShader;
-        //cout << "binded texture..." <<("material." + name + number) <<endl;
-         shader.setInt(("material." + name + number).c_str(), i);
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
-    }
-    glActiveTexture(GL_TEXTURE0);
-    glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
-    // draw mesh
-    /*glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);*/
-}  
 
 void Game::loadPyramidAsset(){
   string fname = "./assets/pyramid.json";
@@ -129,7 +69,9 @@ void Game::loadPyramidAsset(){
   this->vertexCount = arr.Size();
   this->uniqueVertexCount = this->vertexCount;
   this->columnsCount =  arr[0].GetArray().Size();
- 
+  cout<< "vertex count " << this->vertexCount << endl;
+  cout << "cols count "<< this->columnsCount << endl;
+  
   this->indexBuffer.reserve(this->vertexCount);
   for(size_t i = 0; i < this->vertexCount ; i++){
     this->indexBuffer[i] = i;
@@ -180,9 +122,9 @@ bool Game::Init()
     return false;
   }
 
- //this->texture = std::unique_ptr<Texture>(new Texture());
+  this->texture = std::unique_ptr<Texture>(new Texture());
 
- //this->texture->Load("./assets/container/12281_Container_diffuse.png");//"./assets/wall.png");
+  this->texture->Load("./assets/wall.png");
 
   this->spriteShader->SetActive();
 
@@ -350,10 +292,10 @@ void Game::DoOutput()
 
   auto model = glm::mat4(1.0f);
   glm::quat qX = glm::quat(glm::vec3(glm::radians(92.0f), 0.0f, 0.0f));
- // model = glm::toMat4(qX);
+  model = glm::toMat4(qX);
   glm::quat qY = glm::quat(glm::vec3(0.0f, glm::radians(this->rotationAngle), 0.0f));
   model = model * glm::toMat4(qY);
-  model = glm::scale(model, glm::vec3(0.01f));
+  model = glm::scale(model, glm::vec3(1.55f));
 
   this->rotationAngle += 1.0f;
   if (this->rotationAngle > 360.0f)
@@ -368,13 +310,11 @@ void Game::DoOutput()
   glm::vec3 target = cameraPos + cameraFront;
 
   auto view = glm::lookAt(cameraPos, target, cameraUp);
-   auto t = glm::mat4(1.0f);
   this->spriteShader->SetMatrixUniform("projectionMatrix", glm::value_ptr(projection));
   this->spriteShader->SetMatrixUniform("viewMatrix", glm::value_ptr(view));
- 
-  this->spriteShader->SetMatrixUniform("transformMatrix", glm::value_ptr( model ));
-  this->Draw();
- // glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
+  this->spriteShader->SetMatrixUniform("transformMatrix", glm::value_ptr(model));
+
+  glDrawElements(GL_TRIANGLES, this->vertexCount, GL_UNSIGNED_INT, nullptr);
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SwapWindow(this->window);
 }
