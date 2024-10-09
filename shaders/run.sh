@@ -1,14 +1,26 @@
 #!/bin/bash
 pkill main
-rm -r ./build/* &
-outname=1
-for f in ./**/*.cpp ./*.cpp ../common/*.cpp; do 
- g++ -c ${f} -o "./build/$outname.o"
- outname=$((outname + 1))
-done;
+#rm -r ./build/* &
+
+#for fullFileName in ./**/*.cpp  ./*.cpp ../common/*.cpp ; do
+
+ 
+#done;
+echo "compiling..."
+for fullFileName in "$@"
+do 
+    fname=${fullFileName##*/} #remove base path from file name
+    fname=${fname%.*} #remove extension from file name
+    echo "g++ -c ${fullFileName} -o "./build/$fname.o"" 
+    g++ -c ${fullFileName} -o "./build/$fname.o"
+done
+echo "compile end."
+
+
 
 prms=$(find ./build -type f -exec echo {} +)
 cmd="g++ -o ./main $prms -lassimp -lSOIL -lGL -lGLEW -lSDL2 "
+echo $cmd
 eval $cmd
 ./main & echo "runned"
 # sudo apt-get install libglew-dev
@@ -16,4 +28,8 @@ eval $cmd
 # sudo apt install libglm-dev
 # sudo apt-get install rapidjson-dev
 # sudo apt-get install libassimp-dev
+
+
+
+
 
