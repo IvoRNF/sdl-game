@@ -1,20 +1,32 @@
 #!/bin/bash
 pkill main
-#rm -r ./build/* &
+# &
 
-#for fullFileName in ./**/*.cpp  ./*.cpp ../common/*.cpp ; do
 
- 
-#done;
-echo "compiling..."
-for fullFileName in "$@"
-do 
-    fname=${fullFileName##*/} #remove base path from file name
-    fname=${fname%.*} #remove extension from file name
-    echo "g++ -c ${fullFileName} -o "./build/$fname.o"" 
-    g++ -c ${fullFileName} -o "./build/$fname.o"
-done
-echo "compile end."
+if [ $# -eq 0 ]
+then
+    echo "Full compilation..."
+    rm -r ./build/*
+    for fullFileName in ./**/*.cpp  ./*.cpp ../common/*.cpp   ; do
+        fname=${fullFileName##*/} #remove base path from file name
+        fname=${fname%.*} #remove extension from file name
+        echo "g++ -c ${fullFileName} -o "./build/$fname.o"" 
+        g++ -c ${fullFileName} -o "./build/$fname.o"
+    done
+    echo "Full compilation END ..."
+else 
+    echo "compiling..."
+    for fullFileName in "$@"
+    do 
+        fname=${fullFileName##*/} #remove base path from file name
+        fname=${fname%.*} #remove extension from file name
+        echo "g++ -c ${fullFileName} -o "./build/$fname.o"" 
+        g++ -c ${fullFileName} -o "./build/$fname.o"
+    done
+    echo "compile end."  
+fi
+
+
 
 
 
