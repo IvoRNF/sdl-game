@@ -65,7 +65,7 @@ bool Game::Init()
   glGetError();
   
  
-  stbi_set_flip_vertically_on_load(true);
+  //stbi_set_flip_vertically_on_load(true);
 
    // build and compile shaders
     // -------------------------
@@ -75,7 +75,7 @@ bool Game::Init()
   // -----------
   //"/home/ivo/Documents/c++/shaders/assets/container/12281_Container_v2_L2.obj"
   //"./assets/airplane/11803_Airplane_v1_l1.obj"
-  string model_name = "./assets/backpack/backpack.obj";
+  string model_name = "./assets/airplane/11665_Airplane_v1_l3.obj";////"./assets/backpack/backpack.obj";
   ourModel = new Model(FileSystem::getPath(model_name));
 
   return true;
@@ -159,7 +159,7 @@ void Game::ProcessInput()
   }
   auto state = SDL_GetKeyboardState(NULL);
 
- // yawAndPitchMouse();
+  yawAndPitchMouse();
   if (state[SDL_SCANCODE_ESCAPE])
   {
     this->running = false;
@@ -242,7 +242,7 @@ void Game::DoOutput()
   ourShader->use();
 
         // view/projection transformations
-  auto Zoom = 45.0f;
+   auto Zoom = 45.0f;
   glm::mat4 projection = glm::perspective(glm::radians(Zoom), (float)Width/ (float)Height, 0.1f, 100.0f);
   
   glm::vec3 direction;
@@ -261,8 +261,9 @@ void Game::DoOutput()
   // render the loaded model
   glm::mat4 model = glm::mat4(1.0f);
   //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-  model = glm::rotate(model,90.0f,glm::vec3(0.0f,1.0f,0.0f));
-  auto scale = 1.0f;
+  model = glm::rotate(model,45.0f,glm::vec3(0.0f,1.0f,0.0f));
+  model = glm::rotate(model,45.0f,glm::vec3(0.0f,0.0f,1.0f));
+  auto scale = 0.6f;
   model = glm::scale(model, glm::vec3(scale,scale,scale));	// it's a bit too big for our scene, so scale it down
   ourShader->setMat4("model", model);
   ourModel->Draw(*ourShader);

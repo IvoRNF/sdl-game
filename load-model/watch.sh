@@ -3,7 +3,7 @@
 #./watch.sh
 
 # ./**/*.cpp  ./*.cpp ../common/*.cpp
-inotifywait -r -m -e modify "/home/ivo/Documents/c++/shaders/game/" --include './**/*.cpp' | 
+inotifywait -r -m -e modify "/home/ivo/Documents/c++/load-model/game/" --include './**/*.cpp' | 
 while read -r dir action file; do
     fname="$dir$file"
     echo "this file $fname has changed." 
