@@ -36,12 +36,12 @@ private:
     glm::vec3 cameraFront;
     glm::vec3 cameraUp;
     glm::vec3 cameraRight;
-    float rotationAngle;
     float yaw; 
     float pitch;
     Model * ourModel;
     Shader * ourShader;
     void yawAndPitchMouse();
+    glm::mat4 getViewMatrix();
 
     float mouseChangeX;
     float mouseChangeY;
@@ -50,5 +50,7 @@ private:
     int lastMouseY;
 
     bool firstMouse;
+    float rotationYaw;
+    float rotationPitch;
 };
 #endif

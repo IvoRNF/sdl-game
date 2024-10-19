@@ -16,8 +16,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
-
-
 using namespace std;
 using namespace rapidjson;
 const int Width = 1024;
@@ -26,11 +24,12 @@ const int Height = 700;
 /* POS(3) - TEXTCORD(2) - COLOR(4)*/
 
 Game::Game()
-    : window(nullptr), context(nullptr), ticksCount(0), running(true), 
+    : window(nullptr), context(nullptr), ticksCount(0), running(true),
       cameraPos{glm::vec3(0.0f, 0.0f, -10.0f)},
       cameraFront{glm::vec3(0.0f, 0.0f, 4.0f)},
       cameraUp{glm::vec3(0.0f, 1.0f, 0.0f)},
-      rotationAngle(35.0f),
+      rotationYaw(1.6f),
+      rotationPitch(4.8f),
       yaw{90.0f},
       pitch{0.0f}
 {
@@ -39,7 +38,7 @@ Game::Game()
 
 bool Game::Init()
 {
-  
+
   int sdlResult = SDL_Init(SDL_INIT_VIDEO);
   if (sdlResult != 0)
   {
@@ -48,7 +47,7 @@ bool Game::Init()
   }
   this->setOpenGLAttributes();
 
-  this->window = SDL_CreateWindow("open gl 35 ", 1900, 0, Width, Height, SDL_WINDOW_OPENGL);
+  this->window = SDL_CreateWindow("open gl ", 1900, 0, Width, Height, SDL_WINDOW_OPENGL);
   if (!this->window)
   {
     SDL_Log("Failed to create window %s", SDL_GetError());
@@ -60,29 +59,25 @@ bool Game::Init()
   if (glewInit() != GLEW_OK)
   {
     SDL_Log("failed to init glew");
-     return false;
+    return false;
   }
   glGetError();
-  
- 
-  //stbi_set_flip_vertically_on_load(true);
 
-   // build and compile shaders
-    // -------------------------
+  // stbi_set_flip_vertically_on_load(true);
+
+  // build and compile shaders
+  // -------------------------
   ourShader = new Shader("./shaders/1.model_loading.vs", "./shaders/1.model_loading.fs");
 
   // load models
   // -----------
   //"/home/ivo/Documents/c++/shaders/assets/container/12281_Container_v2_L2.obj"
   //"./assets/airplane/11803_Airplane_v1_l1.obj"
-  string model_name = "./assets/airplane/11665_Airplane_v1_l3.obj";////"./assets/backpack/backpack.obj";
+  string model_name = "./assets/airplane/11665_Airplane_v1_l3.obj"; ////"./assets/backpack/backpack.obj";
   ourModel = new Model(FileSystem::getPath(model_name));
 
   return true;
 }
-
-
-
 
 void Game::setOpenGLAttributes()
 {
@@ -215,6 +210,21 @@ void Game::ProcessInput()
   {
     this->pitch = -89.0f;
   }
+
+  auto step = 0.1;
+  if(state[SDL_SCANCODE_UP]){
+    this->rotationPitch += step;
+  }
+  if(state[SDL_SCANCODE_DOWN]){
+    this->rotationPitch -= step;
+  }
+
+  if(state[SDL_SCANCODE_LEFT]){
+    this->rotationYaw += step;
+  }
+  if(state[SDL_SCANCODE_RIGHT]){
+     this->rotationYaw -= step;
+  }
 }
 
 void Game::Update()
@@ -234,17 +244,8 @@ void Game::Update()
   this->ticksCount = SDL_GetTicks();
 }
 
-void Game::DoOutput()
+glm::mat4 Game::getViewMatrix()
 {
-  glClearColor(0, 0, 0, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  ourShader->use();
-
-        // view/projection transformations
-   auto Zoom = 45.0f;
-  glm::mat4 projection = glm::perspective(glm::radians(Zoom), (float)Width/ (float)Height, 0.1f, 100.0f);
-  
   glm::vec3 direction;
   direction.x = cos(glm::radians(this->yaw)) * cos(glm::radians(this->pitch));
   direction.y = sin(glm::radians(this->pitch));
@@ -252,24 +253,37 @@ void Game::DoOutput()
   cameraFront = glm::normalize(direction);
   glm::vec3 target = cameraPos + cameraFront;
 
-  glm::mat4 view = glm::lookAt(cameraPos, target, cameraUp);
-  
-  //glm::mat4 view = camera.GetViewMatrix();
+  return glm::lookAt(cameraPos, target, cameraUp);
+}
+
+void Game::DoOutput()
+{
+  glClearColor(0, 0, 0, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  ourShader->use();
+
+  // view/projection transformations
+  auto Zoom = 45.0f;
+  glm::mat4 projection = glm::perspective(glm::radians(Zoom), (float)Width / (float)Height, 0.1f, 100.0f);
+
+  glm::mat4 view = this->getViewMatrix();
   ourShader->setMat4("projection", projection);
   ourShader->setMat4("view", view);
 
   // render the loaded model
   glm::mat4 model = glm::mat4(1.0f);
-  //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-  model = glm::rotate(model,45.0f,glm::vec3(0.0f,1.0f,0.0f));
-  model = glm::rotate(model,45.0f,glm::vec3(0.0f,0.0f,1.0f));
-  auto scale = 0.6f;
-  model = glm::scale(model, glm::vec3(scale,scale,scale));	// it's a bit too big for our scene, so scale it down
+  // model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+  //model = glm::rotate(model, 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+  model = glm::rotate(model, this->rotationYaw, glm::vec3(0.0f, 1.0f, 0.0f));
+  model = glm::rotate(model, this->rotationPitch, glm::vec3(1.0f, 0.0f, 0.0f));
+ // model = glm::rotate(model, -90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+  //model = glm::rotate(model, -360.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+  auto scale = 0.4f;
+  model = glm::scale(model, glm::vec3(scale)); // it's a bit too big for our scene, so scale it down
   ourShader->setMat4("model", model);
   ourModel->Draw(*ourShader);
-
 
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SwapWindow(this->window);
 }
-
