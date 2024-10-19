@@ -4,7 +4,6 @@
 class FPSCamera
 {
 
-    
 public:
     FPSCamera()
         : cameraPos{glm::vec3(0.0f, 0.0f, -10.0f)},
