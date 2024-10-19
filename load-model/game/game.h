@@ -9,12 +9,10 @@
 #include "./shader.h"
 #include "./shader_m.h"
 #include "./filesystem.h"
+#include "./camera.h"
 
 
-
-//#define STB_IMAGE_IMPLEMENTATION
-//#include "stb/stb_image.h"
-class Game
+class Game : public FPSCamera
 {
 
 public:
@@ -32,24 +30,11 @@ private:
     Uint32 ticksCount;
     SDL_GLContext context;
     bool running;
-    glm::vec3 cameraPos;
-    glm::vec3 cameraFront;
-    glm::vec3 cameraUp;
-    glm::vec3 cameraRight;
-    float yaw; 
-    float pitch;
+    
     Model * ourModel;
     Shader * ourShader;
-    void yawAndPitchMouse();
-    glm::mat4 getViewMatrix();
 
-    float mouseChangeX;
-    float mouseChangeY;
-
-    int lastMouseX;
-    int lastMouseY;
-
-    bool firstMouse;
+    
     float rotationYaw;
     float rotationPitch;
 };
