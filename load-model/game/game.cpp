@@ -63,16 +63,14 @@ bool Game::Init()
   // build and compile shaders
   // -------------------------
   ourShader = new Shader("./shaders/1.model_loading.vs", "./shaders/1.model_loading.fs");
-
   // load models
   // -----------
-  //"/home/ivo/Documents/c++/shaders/assets/container/12281_Container_v2_L2.obj"
-  //"./assets/airplane/11803_Airplane_v1_l1.obj"
-   string model_name = "./assets/airplane/11665_Airplane_v1_l3.obj"; ////"./assets/backpack/backpack.obj";
+
+  string model_name = "./assets/airplane/11665_Airplane_v1_l3.obj";
   ourModel = new Model();
-  ourModel->loadModel(FileSystem::getPath(model_name));
+   ourModel->loadModel(FileSystem::getPath(model_name));
   auto cubeFname = "/home/ivo/Documents/c++/load-model/assets/cube/pyramid.json";
-  auto cubeTextureFname =  "/home/ivo/Documents/c++/load-model/assets/cube/wall.png";
+  auto cubeTextureFname = "/home/ivo/Documents/c++/load-model/assets/cube/wall.png";
   cubeModel = new Model();
   cubeModel->loadModelFromJSON(cubeFname, cubeTextureFname);
 
@@ -115,7 +113,7 @@ void Game::ShutDown()
 }
 
 void Game::ProcessInput()
-{ 
+{
   SDL_Event event;
   while (SDL_PollEvent(&event))
   {
@@ -188,7 +186,7 @@ void Game::DoOutput()
 
   // render the loaded model
   glm::mat4 model = glm::mat4(1.0f);
-  // model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+  model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
   // model = glm::rotate(model, 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
   model = glm::rotate(model, this->rotationYaw, glm::vec3(0.0f, 1.0f, 0.0f));
   model = glm::rotate(model, this->rotationPitch, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -198,7 +196,6 @@ void Game::DoOutput()
   model = glm::scale(model, glm::vec3(scale)); // it's a bit too big for our scene, so scale it down
   ourShader->setMat4("model", model);
   ourModel->Draw(*ourShader);
-
   this->cubeModel->Draw(*ourShader);
 
   glEnable(GL_DEPTH_TEST);

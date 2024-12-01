@@ -84,10 +84,12 @@ public:
             glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
+           // cout << "binded texture " << textures[i].id << endl;
         }
         
         // draw mesh
         glBindVertexArray(VAO);
+         // cout << "glDrawElements(GL_TRIANGLES" << indices.size()<< endl;
         glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 

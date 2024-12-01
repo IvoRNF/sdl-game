@@ -36,6 +36,7 @@ public:
     // draws the model, and thus all its meshes
     void Draw(Shader &shader)
     {
+        //cout << "DRAW" << meshes.size() << endl;
         for (unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shader);
     }
@@ -89,9 +90,8 @@ public:
         auto columnsCount = arr[0].GetArray().Size();
         cout << "vertex count " << vertexCount << endl;
         cout << "cols count " << columnsCount << endl;
-
-        this->processMashFromJSONRows(arr, texturefname);
-
+        auto mesh = this->processMashFromJSONRows(arr, texturefname);
+        this->meshes.push_back(mesh);
         cout << "loaded sucess json" << endl;
     }
 
