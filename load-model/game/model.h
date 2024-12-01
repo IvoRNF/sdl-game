@@ -7,19 +7,18 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
+#include "rapidjson/document.h"
 #include "mesh.h"
-
 #include "shader.h"
-
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <map>
 #include <vector>
+#include <SOIL/SOIL.h>
 using namespace std;
-
+using namespace rapidjson;
 class Model
 {
 public:
@@ -30,9 +29,8 @@ public:
     bool gammaCorrection;
 
     // constructor, expects a filepath to a 3D model.
-    Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
+    Model() : gammaCorrection(false)
     {
-        loadModel(path);
     }
 
     // draws the model, and thus all its meshes
@@ -42,8 +40,6 @@ public:
             meshes[i].Draw(shader);
     }
 
-private:
-    // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
     void loadModel(string const &path)
     {
         // read file via ASSIMP
@@ -62,6 +58,46 @@ private:
         processNode(scene->mRootNode, scene);
     }
 
+    void loadModelFromJSON(string const &fname, string const &texturefname)
+    {
+
+        std::ifstream fileLoaded(fname, std::ios::in | std::ios::binary | std::ios::ate);
+        if (!fileLoaded.is_open())
+        {
+            cerr << printf("file %s not found ", fname.c_str()) << endl;
+            return;
+        }
+        std::ifstream::pos_type fileSz = fileLoaded.tellg();
+        fileLoaded.seekg(0, std::ios::beg);
+        std::vector<char> bytes(static_cast<size_t>(fileSz) + 1);
+        fileLoaded.read(bytes.data(), static_cast<size_t>(fileSz));
+        Document doc;
+        doc.Parse(bytes.data());
+        if (!doc.IsArray())
+        {
+            cerr << printf("%s is not an array", fname.c_str()) << endl;
+        }
+        auto arr = doc.GetArray();
+        if (arr.Size() == 0)
+        {
+            return;
+        }
+
+        this->directory = fname.substr(0, fname.find_last_of('/'));
+
+        auto vertexCount = arr.Size();
+        auto columnsCount = arr[0].GetArray().Size();
+        cout << "vertex count " << vertexCount << endl;
+        cout << "cols count " << columnsCount << endl;
+
+        this->processMashFromJSONRows(arr, texturefname);
+
+        cout << "loaded sucess json" << endl;
+    }
+
+private:
+    // loads a model with supported ASSIMP extensions from file and stores the resulting meshes in the meshes vector.
+
     // processes a node in a recursive fashion. Processes each individual mesh located at the node and repeats this process on its children nodes (if any).
     void processNode(aiNode *node, const aiScene *scene)
     {
@@ -78,6 +114,57 @@ private:
         {
             processNode(node->mChildren[i], scene);
         }
+    }
+
+    Mesh processMashFromJSONRows(rapidjson::GenericArray<false, rapidjson::Value> rows, std::string textureName)
+    {
+        vector<Vertex> vertices;
+        vector<unsigned int> indices;
+        vector<Texture> textures;
+        auto vertexCount = rows.Size();
+        auto columnsCount = rows[0].GetArray().Size();
+        /*  POS(3) - TEXTCORD(2) - COLOR(4) */
+        for (int i = 0; i < vertexCount; i++)
+        {
+            auto columns = rows[i].GetArray();
+            Vertex vertex;
+            glm::vec3 vector; // we declare a placeholder vector since assimp uses its own vector class that doesn't directly convert to glm's vec3 class so we transfer the data to this placeholder glm::vec3 first.
+            // positions
+            vector.x = columns[0].Get<double>();
+            vector.y = columns[1].Get<double>();
+            vector.z = columns[2].Get<double>();
+            vertex.Position = vector;
+            // normals
+            vector.x = 0.0f;
+            vector.y = 0.0f;
+            vector.z = 0.0f;
+            vertex.Normal = vector;
+            glm::vec2 vec;
+            // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't
+            // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
+            vec.x = columns[3].Get<double>();
+            vec.y = columns[4].Get<double>();
+            vertex.TexCoords = vec;
+            // tangent
+            vector.x = 0.0f;
+            vector.y = 0.0f;
+            vector.z = 0.0f;
+            vertex.Tangent = vector;
+            // bitangent
+            vector.x = 0.0f;
+            vector.y = 0.0f;
+            vector.z = 0.0f;
+            vertex.Bitangent = vector;
+            vertices.push_back(vertex);
+            indices.push_back(i);
+        } 
+        // return a mesh object created from the extracted mesh  data
+        Texture texture;
+        texture.id = TextureFromFileSOILLib(textureName.c_str());
+        texture.type = "texture_diffuse";
+        texture.path = textureName.c_str();
+        textures.push_back(texture);
+        return Mesh(vertices, indices, textures);
     }
 
     Mesh processMesh(aiMesh *mesh, const aiScene *scene)
@@ -127,7 +214,6 @@ private:
             }
             else
                 vertex.TexCoords = glm::vec2(0.0f, 0.0f);
-
             vertices.push_back(vertex);
         }
         // now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
@@ -162,6 +248,40 @@ private:
 
         // return a mesh object created from the extracted mesh data
         return Mesh(vertices, indices, textures);
+    }
+
+    unsigned int TextureFromFileSOILLib(const std::string &fileName)
+    {
+        int channels = 0;
+        int width = 0;
+        int height = 0;
+        unsigned int textureID = 0;
+        unsigned char *image = SOIL_load_image(fileName.c_str(),
+                                               &width, &height, &channels, SOIL_LOAD_AUTO);
+        if (image == nullptr)
+        {
+            SDL_Log("SOIL failed to load image %s: %s", fileName.c_str(), SOIL_last_result());
+            return false;
+        }
+        int format = GL_RGB;
+        if (channels == 4)
+        {
+            format = GL_RGBA;
+        }
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+        glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
+                     GL_UNSIGNED_BYTE, image);
+        SOIL_free_image_data(image);
+        // Enable bilinear filtering
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        return textureID;
     }
 
     unsigned int TextureFromFile(const char *path, const string &directory, bool gamma = false)

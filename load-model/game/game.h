@@ -32,6 +32,7 @@ private:
     bool running;
     
     Model * ourModel;
+    Model * cubeModel;
     Shader * ourShader;
 
     
