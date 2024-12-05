@@ -23,6 +23,7 @@ public:
 
 private:
     void ProcessInput();
+    glm::mat4 createModelFromCamera();
     void Update();
     void DoOutput();
     void setOpenGLAttributes();
@@ -30,10 +31,11 @@ private:
     Uint32 ticksCount;
     SDL_GLContext context;
     bool running;
-    
+    glm::mat4 modelCubeMatrix;
     Model * ourModel;
     Model * cubeModel;
     Shader * ourShader;
+    Shader * cubeShader;
 
     
     float rotationYaw;

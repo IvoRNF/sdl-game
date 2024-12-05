@@ -27,7 +27,8 @@ Game::Game()
     : window(nullptr), context(nullptr), ticksCount(0), running(true),
       rotationYaw(1.6f),
       rotationPitch(4.8f),
-      FPSCamera()
+      FPSCamera(),
+      modelCubeMatrix{createModelFromCamera()}
 {
 }
 
@@ -65,21 +66,22 @@ bool Game::Init()
   ourShader = new Shader("./shaders/1.model_loading.vs", "./shaders/1.model_loading.fs");
   // load models
   // -----------
-
+  cubeShader = new Shader("./shaders/1.model_loading_cube.vs", "./shaders/1.model_loading_cube.fs");
   string model_name = "./assets/airplane/11665_Airplane_v1_l3.obj";
   ourModel = new Model();
-   ourModel->loadModel(FileSystem::getPath(model_name));
-  auto cubeFname = "/home/ivo/Documents/c++/load-model/assets/cube/pyramid.json";
-  auto cubeTextureFname = "/home/ivo/Documents/c++/load-model/assets/cube/wall.png";
+  ourModel->loadModel(FileSystem::getPath(model_name));
+  auto cubeFname = "/home/ivo/Documents/c++/load-model/assets/cube/cube.json";
+  auto cubeTextureFname = "/home/ivo/Documents/c++/load-model/assets/cube/sky-box-montain-day.png";
   cubeModel = new Model();
   cubeModel->loadModelFromJSON(cubeFname, cubeTextureFname);
-
+  modelCubeMatrix = createModelFromCamera();
+  modelCubeMatrix = glm::translate(modelCubeMatrix,glm::vec3(0.0f,0.0f,-2.0f));
   return true;
 }
 
 void Game::setOpenGLAttributes()
 {
-  // Set OpenGL attributes
+   // Set OpenGL attributes
   // Use the core OpenGL profile
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   // Specify version 3.3
@@ -169,6 +171,14 @@ void Game::Update()
   this->ticksCount = SDL_GetTicks();
 }
 
+glm::mat4 Game::createModelFromCamera(){
+  glm::mat4 model = glm::mat4(1.0f);
+  model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
+  model = glm::rotate(model, this->rotationYaw, glm::vec3(0.0f, 1.0f, 0.0f));
+  model = glm::rotate(model, this->rotationPitch, glm::vec3(1.0f, 0.0f, 0.0f));
+  return model;
+}
+
 void Game::DoOutput()
 {
   glClearColor(0, 0, 0, 1.0f);
@@ -185,19 +195,17 @@ void Game::DoOutput()
   ourShader->setMat4("view", view);
 
   // render the loaded model
-  glm::mat4 model = glm::mat4(1.0f);
-  model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-  // model = glm::rotate(model, 45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-  model = glm::rotate(model, this->rotationYaw, glm::vec3(0.0f, 1.0f, 0.0f));
-  model = glm::rotate(model, this->rotationPitch, glm::vec3(1.0f, 0.0f, 0.0f));
-  // model = glm::rotate(model, -90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-  // model = glm::rotate(model, -360.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+  glm::mat4 model = this->createModelFromCamera();
   auto scale = 0.4f;
   model = glm::scale(model, glm::vec3(scale)); // it's a bit too big for our scene, so scale it down
   ourShader->setMat4("model", model);
   ourModel->Draw(*ourShader);
-  this->cubeModel->Draw(*ourShader);
 
+  this->cubeShader->use();
+  this->cubeShader->setMat4("model", modelCubeMatrix);
+  cubeShader->setMat4("projection", projection);
+  cubeShader->setMat4("view", view);
+   this->cubeModel->Draw(*cubeShader);
   glEnable(GL_DEPTH_TEST);
   SDL_GL_SwapWindow(this->window);
 }
