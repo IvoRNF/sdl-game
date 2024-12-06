@@ -5,6 +5,7 @@ class FPSCamera
 {
 
 public:
+   glm::vec3 cameraPos;
     FPSCamera()
         : cameraPos{glm::vec3(0.0f, 0.0f, -10.0f)},
           cameraFront{glm::vec3(0.0f, 0.0f, 4.0f)},
@@ -110,7 +111,7 @@ private:
             this->pitch = -89.0f;
         }
     }
-    glm::vec3 cameraPos;
+    
     glm::vec3 cameraFront;
     glm::vec3 cameraUp;
     glm::vec3 cameraRight;

@@ -24,6 +24,7 @@ public:
 private:
     void ProcessInput();
     glm::mat4 createModelFromCamera();
+    glm::mat4 createModelFromSkyCube();
     void Update();
     void DoOutput();
     void setOpenGLAttributes();
@@ -31,7 +32,6 @@ private:
     Uint32 ticksCount;
     SDL_GLContext context;
     bool running;
-    glm::mat4 modelCubeMatrix;
     Model * ourModel;
     Model * cubeModel;
     Shader * ourShader;

@@ -27,8 +27,7 @@ Game::Game()
     : window(nullptr), context(nullptr), ticksCount(0), running(true),
       rotationYaw(1.6f),
       rotationPitch(4.8f),
-      FPSCamera(),
-      modelCubeMatrix{createModelFromCamera()}
+      FPSCamera()
 {
 }
 
@@ -74,8 +73,6 @@ bool Game::Init()
   auto cubeTextureFname = "/home/ivo/Documents/c++/load-model/assets/cube/sky-box-montain-day.png";
   cubeModel = new Model();
   cubeModel->loadModelFromJSON(cubeFname, cubeTextureFname);
-  modelCubeMatrix = createModelFromCamera();
-  modelCubeMatrix = glm::translate(modelCubeMatrix,glm::vec3(0.0f,0.0f,-2.0f));
   return true;
 }
 
@@ -179,6 +176,16 @@ glm::mat4 Game::createModelFromCamera(){
   return model;
 }
 
+glm::mat4 Game::createModelFromSkyCube(){
+  glm::mat4 model = glm::mat4(1.0f);
+  model = glm::translate(model, this->cameraPos); // translate it down so it's at the center of the scene
+  model = glm::rotate(model, this->rotationYaw, glm::vec3(0.0f, 1.0f, 0.0f));
+  model = glm::rotate(model, this->rotationPitch, glm::vec3(1.0f, 0.0f, 0.0f));
+  model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+  
+  return model;
+}
+
 void Game::DoOutput()
 {
   glClearColor(0, 0, 0, 1.0f);
@@ -189,23 +196,27 @@ void Game::DoOutput()
   // view/projection transformations
   auto Zoom = 45.0f;
   glm::mat4 projection = glm::perspective(glm::radians(Zoom), (float)Width / (float)Height, 0.1f, 100.0f);
-
   glm::mat4 view = this->getViewMatrix();
-  ourShader->setMat4("projection", projection);
-  ourShader->setMat4("view", view);
 
-  // render the loaded model
-  glm::mat4 model = this->createModelFromCamera();
-  auto scale = 0.4f;
-  model = glm::scale(model, glm::vec3(scale)); // it's a bit too big for our scene, so scale it down
-  ourShader->setMat4("model", model);
-  ourModel->Draw(*ourShader);
 
+  //skycube
   this->cubeShader->use();
-  this->cubeShader->setMat4("model", modelCubeMatrix);
+  this->cubeShader->setMat4("model",  this->createModelFromSkyCube());
   cubeShader->setMat4("projection", projection);
   cubeShader->setMat4("view", view);
-   this->cubeModel->Draw(*cubeShader);
+  glFrontFace(GL_CCW);
+  glDisable(GL_DEPTH_TEST);
+  this->cubeModel->Draw(*cubeShader);
   glEnable(GL_DEPTH_TEST);
+
+  //airplane
+   glm::mat4 model = this->createModelFromCamera();
+  auto scale = 0.4f;
+  ourShader->setMat4("projection", projection);
+  ourShader->setMat4("view", view);
+  model = glm::scale(model, glm::vec3(scale)); // it's a bit too big for our scene, so scale it down
+  ourShader->setMat4("model", model);
+  ourModel->Draw(*ourShader);;
+  
   SDL_GL_SwapWindow(this->window);
 }
